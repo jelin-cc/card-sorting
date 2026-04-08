@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공고 카드 정보 나누기</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #00C471;
+    --primary-light: #E8FAF0;
+    --primary-dark: #00A85E;
+    --yellow: #FFB800;
+    --yellow-light: #FFF8E6;
+    --red: #FF4D4D;
+    --red-light: #FFF0F0;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+  }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ===== INTRO ===== */
+  #intro {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+    background: white;
+  }
+
+  .intro-icon {
+    width: 120px; height: 120px;
+    background: var(--primary-light);
+    border-radius: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 56px;
+    margin-bottom: 32px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .intro-title {
+    font-size: 32px; font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .intro-title span { color: var(--primary); }
+
+  .intro-desc {
+    font-size: 16px; color: var(--gray-500);
+    line-height: 1.6; margin-bottom: 40px;
+    max-width: 360px;
+  }
+
+  .marquee-outer {
+    width: 100%;
+    max-width: 520px;
+    margin-bottom: 40px;
+  }
+
+  .marquee-row {
+    overflow: hidden;
+    margin-bottom: 10px;
+    mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 10px;
+    width: max-content;
+    animation: marquee 18s linear infinite;
+  }
+
+  .marquee-track:hover { animation-play-state: paused; }
+
+  .marquee-row-2 .marquee-track { animation-direction: reverse; animation-duration: 22s; }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .preview-chip {
+    padding: 8px 18px;
+    background: white;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 24px;
+    font-size: 14px; font-weight: 600;
+    color: var(--gray-700);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .preview-chip:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    transform: scale(1.05);
+  }
+
+  .intro-buttons {
+    display: flex; flex-direction: column; gap: 10px; align-items: center;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 16px 0;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 196, 113, 0.3);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-primary:disabled {
+    background: var(--gray-300);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: none;
+    padding: 16px 0;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .btn-secondary:hover {
+    background: var(--gray-200);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  .btn-secondary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 8px 16px;
+    border-radius: 10px;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover { color: var(--gray-600); background: var(--gray-100); }
+
+  /* History section on intro */
+  .history-section {
+    margin-top: 48px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .history-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-400);
+    margin-bottom: 12px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    text-align: left;
+    transition: all 0.15s;
+  }
+
+  .history-item:hover { background: var(--gray-100); }
+
+  .history-avatar {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .history-info { flex: 1; }
+
+  .history-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+
+  .history-time {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 2px;
+  }
+
+  .history-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  /* ===== NAME INPUT ===== */
+  #name-input {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: white;
+    text-align: center;
+  }
+
+  .name-emoji { font-size: 48px; margin-bottom: 24px; }
+
+  .name-title {
+    font-size: 24px; font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .name-sub {
+    font-size: 15px; color: var(--gray-400);
+    margin-bottom: 32px;
+  }
+
+  .name-field {
+    width: 100%;
+    max-width: 320px;
+    padding: 16px 20px;
+    border: 2px solid var(--gray-200);
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    margin-bottom: 24px;
+    color: var(--gray-900);
+  }
+
+  .name-field::placeholder { color: var(--gray-300); }
+  .name-field:focus { border-color: var(--primary); }
+
+  /* ===== SORTING ===== */
+  #sorting {
+    flex-direction: column;
+    background: var(--gray-50);
+  }
+
+  .sort-header {
+    background: white;
+    padding: 20px 32px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .sort-header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .sort-header-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .sort-step {
+    display: inline-flex;
+    align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 5px 12px;
+    border-radius: 8px;
+  }
+
+  .sort-participant-badge {
+    font-size: 13px;
+    color: var(--gray-500);
+    font-weight: 600;
+  }
+
+  .header-progress {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .header-progress-bar {
+    width: 120px; height: 6px;
+    background: var(--gray-100); border-radius: 3px; overflow: hidden;
+  }
+
+  .header-progress-fill {
+    height: 100%; background: var(--primary); border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .header-progress-label {
+    font-size: 13px; color: var(--gray-400); font-weight: 600; white-space: nowrap;
+  }
+
+  .header-progress-label b { color: var(--primary); }
+
+  .sort-title {
+    font-size: 20px; font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  .sort-desc {
+    font-size: 13px; color: var(--gray-400);
+    line-height: 1.5;
+  }
+
+  .sort-layout {
+    flex: 1;
+    display: flex;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .sort-left {
+    width: 320px;
+    flex-shrink: 0;
+    padding: 20px;
+    border-right: 1px solid var(--gray-100);
+    background: white;
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+  }
+
+  .sort-right {
+    flex: 1;
+    padding: 20px 28px;
+    min-width: 0;
+  }
+
+  .ref-panel-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+  }
+
+  .ref-panel-sub {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-bottom: 20px;
+  }
+
+  .ref-card-stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ref-card-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-400);
+    margin-bottom: 8px;
+  }
+
+  /* Unsorted */
+  .unsorted-area { margin-bottom: 20px; }
+
+  .unsorted-label {
+    font-size: 13px; font-weight: 600;
+    color: var(--gray-400);
+    margin-bottom: 10px;
+  }
+
+  .unsorted-cards {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    min-height: 48px;
+    padding: 14px;
+    background: white;
+    border-radius: var(--radius);
+    border: 2px dashed var(--gray-200);
+    transition: all 0.2s;
+  }
+
+  .unsorted-cards.drag-over {
+    border-color: var(--gray-400);
+    background: var(--gray-50);
+  }
+
+  .unsorted-cards:empty::after {
+    content: '모든 카드를 분류했어요!';
+    color: var(--gray-300);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 8px;
+  }
+
+  .card-chip {
+    padding: 10px 16px;
+    background: white;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: grab;
+    transition: all 0.15s;
+    user-select: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-chip:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-chip:active, .card-chip.dragging {
+    cursor: grabbing;
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+
+  .chip-rank {
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    background: var(--primary);
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .chip-rank.rank-nice { background: var(--yellow); }
+  .chip-rank.rank-no { background: var(--red); }
+
+  .chip-remove {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .chip-remove:hover { color: var(--red); background: var(--red-light); }
+
+  /* Categories */
+  .categories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .category-zone {
+    border-radius: var(--radius);
+    padding: 16px;
+    min-height: 180px;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+
+  .category-zone.drag-over {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .cat-must { background: var(--primary-light); border-color: rgba(0,196,113,0.15); }
+  .cat-must.drag-over { border-color: var(--primary); }
+  .cat-nice { background: var(--yellow-light); border-color: rgba(255,184,0,0.15); }
+  .cat-nice.drag-over { border-color: var(--yellow); }
+  .cat-no { background: var(--red-light); border-color: rgba(255,77,77,0.15); }
+  .cat-no.drag-over { border-color: var(--red); }
+
+  .cat-header {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 3px;
+  }
+
+  .cat-icon { font-size: 16px; }
+
+  .cat-title { font-size: 15px; font-weight: 800; }
+
+  .cat-must .cat-title { color: #00A85E; }
+  .cat-nice .cat-title { color: #CC9300; }
+  .cat-no .cat-title { color: #E63E3E; }
+
+  .cat-sub { font-size: 11px; font-weight: 500; margin-bottom: 12px; }
+  .cat-must .cat-sub { color: rgba(0,168,94,0.5); }
+  .cat-nice .cat-sub { color: rgba(204,147,0,0.5); }
+  .cat-no .cat-sub { color: rgba(230,62,62,0.5); }
+
+  .cat-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 44px;
+  }
+
+  .cat-cards:empty::after {
+    content: '+ 여기에 드래그';
+    display: block;
+    padding: 12px;
+    border: 2px dashed rgba(0,0,0,0.06);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(0,0,0,0.15);
+    font-weight: 500;
+    pointer-events: none;
+  }
+
+  .cat-cards .card-chip {
+    background: white;
+    border-color: transparent;
+    box-shadow: var(--shadow);
+  }
+
+  /* Must-have reorder hint */
+  .cat-must .cat-cards .card-chip {
+    cursor: grab;
+  }
+
+  .cat-must .cat-cards .card-chip.drag-placeholder {
+    opacity: 0.3;
+    border: 2px dashed var(--primary);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .btn-complete-header {
+    background: var(--primary); color: white; border: none;
+    padding: 8px 20px; border-radius: 10px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn-complete-header:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 16px rgba(0,196,113,0.3);
+  }
+  .btn-complete-header:disabled {
+    background: var(--gray-200); color: var(--gray-400);
+    cursor: not-allowed; box-shadow: none;
+  }
+
+
+
+  /* ===== DONE ===== */
+  #done {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: white;
+    text-align: center;
+  }
+
+  .done-icon {
+    font-size: 72px; margin-bottom: 24px;
+    animation: bounce 0.6s ease;
+  }
+
+  @keyframes bounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .done-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+
+  .done-sub {
+    font-size: 15px; color: var(--gray-400); margin-bottom: 40px;
+  }
+
+  .done-buttons { display: flex; gap: 12px; }
+
+  /* ===== RESULTS ===== */
+  #results {
+    flex-direction: column;
+    background: var(--gray-50);
+  }
+
+  .results-header {
+    background: white;
+    padding: 32px;
+    text-align: center;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .results-title { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  .results-sub { font-size: 14px; color: var(--gray-400); }
+
+  .results-body {
+    padding: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .result-section { margin-bottom: 32px; }
+
+  .result-section-title {
+    font-size: 18px; font-weight: 800; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .result-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+
+  .result-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .result-item:last-child { border-bottom: none; }
+
+  .result-rank {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; flex-shrink: 0;
+  }
+
+  .rank-1 { background: #FFF3CD; color: #CC9300; }
+  .rank-2 { background: #F0F0F0; color: #666; }
+  .rank-3 { background: #FFE8D6; color: #CC6600; }
+  .rank-default { background: var(--gray-100); color: var(--gray-500); }
+
+  .result-name { flex: 1; font-size: 15px; font-weight: 600; }
+
+  .result-bar-wrap {
+    flex: 2; display: flex; align-items: center; gap: 12px;
+  }
+
+  .priority-result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .priority-result-item:last-child { border-bottom: none; }
+
+  .priority-avg {
+    font-size: 24px; font-weight: 800; color: var(--primary); min-width: 48px;
+  }
+
+  .priority-result-name { flex: 1; font-size: 15px; font-weight: 600; }
+
+  .priority-votes {
+    font-size: 12px; color: var(--gray-400);
+    padding: 4px 10px; background: var(--gray-100); border-radius: 6px;
+  }
+
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .insight-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .insight-emoji { font-size: 32px; margin-bottom: 12px; }
+  .insight-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; color: var(--gray-800); }
+  .insight-body { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+  .insight-body b { color: var(--primary); font-weight: 700; }
+
+  .per-participant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px; margin-top: 12px;
+  }
+
+  .per-participant-card {
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+  }
+
+  .per-participant-card h4 {
+    font-size: 14px; font-weight: 700;
+    margin-bottom: 8px; color: var(--gray-600);
+  }
+
+  .per-participant-card .tag-list {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+
+  .mini-tag {
+    font-size: 12px; padding: 4px 10px;
+    border-radius: 6px; font-weight: 600;
+  }
+  .mini-tag.must { background: var(--primary-light); color: #00A85E; }
+  .mini-tag.nice { background: var(--yellow-light); color: #CC9300; }
+  .mini-tag.no { background: var(--red-light); color: #E63E3E; }
+
+  .btn-download {
+    background: var(--gray-900); color: white; border: none;
+    padding: 14px 32px; border-radius: 12px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: all 0.2s;
+  }
+  .btn-download:hover { background: var(--gray-700); transform: translateY(-2px); }
+
+  .results-footer {
+    text-align: center; padding: 32px;
+    display: flex; gap: 12px; justify-content: center;
+  }
+
+  .btn-back {
+    background: none; border: none;
+    font-size: 14px; color: var(--gray-400);
+    cursor: pointer; font-family: inherit; font-weight: 600;
+    padding: 8px 0; transition: color 0.2s;
+  }
+  .btn-back:hover { color: var(--gray-600); }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: confettiFall 1.5s ease-out forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--gray-900); color: white;
+    padding: 14px 24px; border-radius: 14px;
+    font-size: 14px; font-weight: 600;
+    opacity: 0; transition: all 0.3s; z-index: 9999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .categories { grid-template-columns: 1fr; }
+    .sort-layout { flex-direction: column; }
+    .sort-left {
+      width: 100%; position: static; max-height: none;
+      border-right: none; border-bottom: 1px solid var(--gray-100);
+    }
+    .sort-right { padding: 16px; }
+    .sort-header { padding: 16px; }
+    .result-item { flex-wrap: wrap; }
+    .result-bar-wrap { flex-basis: 100%; }
+    .intro-title { font-size: 26px; }
+  }
+
+
+  /* ===== Figma-accurate JD Cards ===== */
+  .jd-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.08);
+    background: white;
+  }
+
+  /* Image type */
+  .jd-card-img .jd-img {
+    width: 100%;
+    height: 150px;
+    background: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=200&fit=crop') center/cover no-repeat;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .jd-img-badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: rgba(41,44,50,0.8);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 18px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    outline: 2px solid rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .jd-badge-icon { font-size: 12px; }
+
+  .jd-img-bookmark {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 24px; height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .jd-body {
+    padding: 12px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .jd-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1A1A1E;
+    line-height: 1.45;
+  }
+
+  .jd-company-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .jd-company {
+    font-size: 13px;
+    font-weight: 600;
+    color: #768091;
+    line-height: 1.45;
+  }
+
+  .jd-dday {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    background: #FFF0F0;
+    border-radius: 4px;
+    color: #FA5252;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .jd-meta {
+    font-size: 11px;
+    font-weight: 400;
+    color: #768091;
+  }
+
+  .jd-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .jd-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    line-height: 1.4;
+  }
+
+  .jd-tag.green {
+    background: #F3FCF9;
+    color: #00C274;
+  }
+
+  /* List type */
+  .jd-card-list {
+    padding: 20px;
+  }
+
+  .jd-list-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .jd-list-main { flex: 1; }
+
+  .jd-list-bookmark {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  /* History detail modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1; pointer-events: auto;
+  }
+
+  .modal-box {
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    transition: transform 0.2s;
+  }
+
+  .modal-overlay.open .modal-box { transform: translateY(0); }
+
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 20px; font-weight: 800;
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    border: none;
+    background: var(--gray-100);
+    color: var(--gray-500);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover { background: var(--gray-200); }
+
+  .modal-cat {
+    margin-bottom: 16px;
+  }
+
+  .modal-cat-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .modal-cat-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .modal-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .modal-chip.must { background: var(--primary-light); color: #00A85E; }
+  .modal-chip.nice { background: var(--yellow-light); color: #CC9300; }
+  .modal-chip.no { background: var(--red-light); color: #E63E3E; }
+
+  .modal-chip-rank {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .modal-chip.must .modal-chip-rank { background: var(--primary); }
+  .modal-chip.nice .modal-chip-rank { background: var(--yellow); }
+  .modal-chip.no .modal-chip-rank { background: var(--red); }
+
+  .modal-time {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-bottom: 20px;
+  }
+
+  .modal-footer {
+    display: flex; justify-content: flex-end; gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  .btn-delete {
+    background: none;
+    border: 1.5px solid var(--red);
+    color: var(--red);
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .btn-delete:hover {
+    background: var(--red);
+    color: white;
+  }
+
+  /* History item delete */
+  .history-item {
+    cursor: pointer;
+    position: relative;
+  }
+
+  /* Floating mode switch button */
+  .fab-mode {
+    position: fixed;
+    bottom: 32px;
+    left: 32px;
+    z-index: 8000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 22px;
+    border-radius: 100px;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    color: white;
+  }
+
+  .fab-mode:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  }
+
+  .fab-mode.mode-review {
+    background: #6366F1;
+  }
+
+  .fab-mode.mode-review:hover { background: #4F46E5; }
+
+  .fab-mode.mode-job {
+    background: var(--primary);
+  }
+
+  .fab-mode.mode-job:hover { background: var(--primary-dark); }
+
+  .fab-icon { font-size: 18px; }
+
+  /* Mode indicator on intro */
+  .mode-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .mode-tab {
+    padding: 10px 24px;
+    border-radius: 100px;
+    border: 2px solid var(--gray-200);
+    background: white;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-500);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .mode-tab:hover { border-color: var(--gray-300); }
+
+  .mode-tab.active-job {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+  }
+
+  .mode-tab.active-review {
+    border-color: #6366F1;
+    background: #EEF2FF;
+    color: #4F46E5;
+  }
+
+  /* Review example card */
+  .review-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.08);
+    font-size: 12px;
+  }
+
+  .review-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .review-logo {
+    width: 28px; height: 28px;
+    background: var(--gray-100);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: var(--gray-500);
+  }
+
+  .review-company-name {
+    font-size: 14px; font-weight: 700; color: var(--gray-800);
+  }
+
+  .review-meta {
+    font-size: 11px; color: #768091;
+    margin-bottom: 10px;
+    display: flex; gap: 6px;
+  }
+
+  .review-meta span { opacity: 0.6; }
+
+  .review-score-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .review-score-num {
+    font-size: 22px; font-weight: 800; color: var(--gray-900);
+  }
+
+  .review-stars { color: var(--primary); font-size: 13px; letter-spacing: 1px; }
+
+  .review-bars {
+    display: flex; flex-direction: column; gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .review-bar-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px; color: #768091;
+  }
+
+  .review-bar-label { width: 48px; flex-shrink: 0; text-align: right; }
+
+  .review-bar {
+    flex: 1; height: 6px;
+    background: var(--gray-100);
+    border-radius: 3px; overflow: hidden;
+  }
+
+  .review-bar-fill {
+    height: 100%; background: var(--primary); border-radius: 3px;
+  }
+
+  .review-title-text {
+    font-size: 13px; font-weight: 700; color: var(--gray-800);
+    margin-bottom: 6px; line-height: 1.4;
+  }
+
+  .review-pros-cons { margin-bottom: 8px; }
+
+  .review-label {
+    display: inline-block;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px;
+    margin-right: 4px;
+  }
+
+  .review-label.pro { background: #E8FAF0; color: #00A85E; }
+  .review-label.con { background: #FFF0F0; color: #FA5252; }
+
+  .review-text {
+    font-size: 11px; color: var(--gray-600);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+
+  .review-footer {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px; color: #768091;
+    padding-top: 8px;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  .review-helpful {
+    padding: 3px 10px;
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gray-500);
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== INTRO ===== -->
+<div id="intro" class="screen active">
+  <div class="intro-icon" id="introIcon">💼</div>
+  <h1 class="intro-title" id="introTitle">공고 카드 정보<br><span>나누기 게임</span></h1>
+  <p class="intro-desc" id="introDesc">
+    공고 카드에 어떤 정보가 들어가면 좋을지,<br>
+    중요한 순서대로 분류해주세요.
+  </p>
+
+  <div class="marquee-outer" id="marqueeWrap"></div>
+  <div class="intro-buttons">
+    <button class="btn-primary" onclick="showScreen('name-input')">시작하기 →</button>
+    <button class="btn-secondary" onclick="showResults()">결과 모아보기</button>
+  </div>
+  <div class="history-section" id="historySection" style="display:none">
+    <div class="history-title">📋 참여 기록 <span id="historyCount" style="color:var(--primary)"></span></div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<!-- ===== NAME INPUT ===== -->
+<div id="name-input" class="screen">
+  <div class="name-emoji">✏️</div>
+  <h2 class="name-title">참여자 이름을 입력해주세요</h2>
+  <p class="name-sub">결과 확인 시 이름과 함께 기록됩니다</p>
+  <input type="text" class="name-field" id="nameField" placeholder="이름 입력" maxlength="20" autocomplete="off">
+  <button class="btn-primary" id="btnStartSort" disabled onclick="startSorting()" style="max-width:320px">분류 시작 →</button>
+  <button class="btn-ghost" style="margin-top:12px" onclick="showScreen('intro')">← 돌아가기</button>
+</div>
+
+<!-- ===== SORTING ===== -->
+<div id="sorting" class="screen">
+  <div class="sort-header">
+    <div class="sort-header-top">
+      <div class="sort-header-left">
+        <span class="sort-step" id="sortStep">카드 분류</span>
+        <span class="sort-participant-badge" id="sortParticipantBadge"></span>
+      </div>
+      <div class="header-progress">
+        <div class="header-progress-bar">
+          <div class="header-progress-fill" id="sortProgress" style="width:0%"></div>
+        </div>
+        <span class="header-progress-label" id="progressText"><b style="color:var(--primary)">0</b> / 12개</span>
+        <button class="btn-complete-header" id="btnNext" disabled onclick="finishSorting()">완료하기 ✓</button>
+      </div>
+    </div>
+    <h2 class="sort-title" id="sortTitle">어떤 정보가 가장 중요한가요?</h2>
+    <p class="sort-desc" id="sortDesc">각 카드를 중요도에 따라 우측 3가지 영역에 넣어주세요. 넣은 순서가 곧 우선순위가 돼요.</p>
+  </div>
+
+  <div class="sort-layout">
+    <!-- LEFT: Example Cards (sticky) -->
+    <div class="sort-left">
+      <div class="ref-panel">
+        <div class="ref-panel-title" id="refPanelTitle">📋 공고 카드 예시</div>
+        <div class="ref-panel-sub" id="refPanelSub">이런 카드에 들어갈 정보를 분류합니다</div>
+
+        <!-- Job card examples -->
+        <div class="ref-card-stack" id="refJobCards">
+          <div class="ref-card-label">이미지형 카드</div>
+          <div class="jd-card jd-card-img">
+            <div class="jd-img">
+              <div class="jd-img-badge">
+                <span class="jd-badge-icon">🎁</span>
+                <span>취업축하금 <b style="color:#FFB74D">200</b>만원</span>
+              </div>
+              <div class="jd-img-bookmark"><svg width="14" height="17" viewBox="0 0 14 17" fill="none"><path d="M1 3C1 1.9 1.9 1 3 1h8c1.1 0 2 .9 2 2v13l-6-3-6 3V3z" fill="#E5E6E9" stroke="white" stroke-width="1"/></svg></div>
+            </div>
+            <div class="jd-body">
+              <div class="jd-title">콘텐츠 디자이너 (3년 이상)</div>
+              <div class="jd-company-row">
+                <span class="jd-company">웍스피어(유)</span>
+                <span class="jd-dday">D-3</span>
+              </div>
+              <div class="jd-meta">서울 · 경력 3년↑</div>
+              <div class="jd-tags">
+                <span class="jd-tag green">워라밸 상위 10%</span>
+                <span class="jd-tag green">수평문화</span>
+              </div>
+            </div>
+          </div>
+          <div class="ref-card-label" style="margin-top:20px">리스트형 카드</div>
+          <div class="jd-card jd-card-list">
+            <div class="jd-list-body">
+              <div class="jd-list-main">
+                <div class="jd-title">Frontend Engineer (React)</div>
+                <div class="jd-company" style="margin-top:4px">네이버</div>
+                <div class="jd-meta" style="margin-top:8px">서울 · 경력 3년↑ · 학력무관</div>
+                <div class="jd-tags" style="margin-top:12px">
+                  <span class="jd-dday">D-3</span>
+                  <span class="jd-tag green">승진 언급 ▲ 12건</span>
+                </div>
+              </div>
+              <div class="jd-list-bookmark"><svg width="14" height="17" viewBox="0 0 14 17" fill="none"><path d="M1 3C1 1.9 1.9 1 3 1h8c1.1 0 2 .9 2 2v13l-6-3-6 3V3z" fill="#AFB5BE"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review card example -->
+        <div class="ref-card-stack" id="refReviewCards" style="display:none">
+          <div class="ref-card-label">리뷰 카드 예시</div>
+          <div class="review-card">
+            <!-- Header -->
+            <div class="review-card-header">
+              <div class="review-logo">당</div>
+              <div class="review-company-name">(주)당근마켓</div>
+            </div>
+            <div class="review-meta">
+              백엔드 <span>|</span> 현직원 <span>|</span> 서울 <span>|</span> 2026.03 작성
+            </div>
+            <!-- Score + Bars (2-column like original) -->
+            <div style="display:flex; gap:12px; margin:12px 0">
+              <div style="flex-shrink:0">
+                <div class="review-score-num">5.0</div>
+                <div class="review-stars">★★★★★</div>
+                <div class="review-bars" style="margin-top:10px">
+                  <div class="review-bar-row"><span class="review-bar-label">승진 기회</span><div class="review-bar"><div class="review-bar-fill" style="width:90%"></div></div></div>
+                  <div class="review-bar-row"><span class="review-bar-label">복지/급여</span><div class="review-bar"><div class="review-bar-fill" style="width:85%"></div></div></div>
+                  <div class="review-bar-row"><span class="review-bar-label">워라밸</span><div class="review-bar"><div class="review-bar-fill" style="width:95%"></div></div></div>
+                  <div class="review-bar-row"><span class="review-bar-label">사내문화</span><div class="review-bar"><div class="review-bar-fill" style="width:92%"></div></div></div>
+                  <div class="review-bar-row"><span class="review-bar-label">경영진</span><div class="review-bar"><div class="review-bar-fill" style="width:75%"></div></div></div>
+                </div>
+              </div>
+              <div style="flex:1; min-width:0">
+                <div class="review-title-text">워라밸과 사내문화 모두 최상급<br>자율 출퇴근에 무제한 휴가까지</div>
+                <div class="review-pros-cons">
+                  <div style="margin-bottom:6px">
+                    <span class="review-label pro">장점</span>
+                    <span class="review-text" style="display:inline">자율과 책임의 밸런스가 완벽. 무제한 휴가를 실제로 자유롭게 사용 가능. 동료들이 서로 존중하는 문화.</span>
+                  </div>
+                  <div>
+                    <span class="review-label con">단점</span>
+                    <span class="review-text" style="display:inline">높은 자율성이 주어지는 만큼 셀프 매니지먼트 능력이 필요. 프로세스가 아직 정립 중인 부분이 있음.</span>
+                  </div>
+                </div>
+                <div style="font-size:10px; color:#768091; margin-top:8px; line-height:1.5">
+                  — 1년 후 성장하고 있을 것 같아요 &nbsp;|&nbsp; 👍 기업을 추천해요
+                </div>
+              </div>
+            </div>
+            <!-- Footer -->
+            <div class="review-footer">
+              <span class="review-helpful">도움이 돼요 👍 198</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Sorting Area -->
+    <div class="sort-right">
+      <div class="unsorted-area">
+        <div class="unsorted-label">📦 아래 영역으로 카드를 드래그해주세요</div>
+        <div class="unsorted-cards" id="unsortedCards"
+             ondrop="dropToUnsorted(event)" ondragover="dragOverUnsorted(event)" ondragleave="dragLeaveUnsorted(event)"></div>
+      </div>
+
+      <div class="categories">
+        <div class="category-zone cat-must" data-category="must"
+             ondrop="dropCard(event,'must')" ondragover="dragOver(event)" ondragleave="dragLeave(event)">
+          <div class="cat-header">
+            <span class="cat-icon">✅</span>
+            <span class="cat-title">꼭 있어야 해요</span>
+          </div>
+          <div class="cat-sub">"이 정보 없으면 공고를 안 볼 것 같아요"</div>
+          <div class="cat-cards" id="mustCards" data-category="must"
+             ondrop="dropCard(event,'must')" ondragover="dragOver(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+
+        <div class="category-zone cat-nice" data-category="nice"
+             ondrop="dropCard(event,'nice')" ondragover="dragOver(event)" ondragleave="dragLeave(event)">
+          <div class="cat-header">
+            <span class="cat-icon">🟡</span>
+            <span class="cat-title">있으면 좋아요</span>
+          </div>
+          <div class="cat-sub">"있으면 참고하지만, 없어도 괜찮아요"</div>
+          <div class="cat-cards" id="niceCards" data-category="nice"
+             ondrop="dropCard(event,'nice')" ondragover="dragOver(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+
+        <div class="category-zone cat-no" data-category="no"
+             ondrop="dropCard(event,'no')" ondragover="dragOver(event)" ondragleave="dragLeave(event)">
+          <div class="cat-header">
+            <span class="cat-icon">❌</span>
+            <span class="cat-title">굳이 안 봐요</span>
+          </div>
+          <div class="cat-sub">"공고 목록에서는 딱히 안 봐요"</div>
+          <div class="cat-cards" id="noCards" data-category="no"
+             ondrop="dropCard(event,'no')" ondragover="dragOver(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DONE ===== -->
+<div id="done" class="screen">
+  <div class="done-icon">🎉</div>
+  <h2 class="done-title">분류 완료!</h2>
+  <p class="done-sub" id="doneSub">소중한 의견 감사합니다</p>
+  <div class="done-buttons">
+    <button class="btn-primary" onclick="goHome()">처음으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div id="results" class="screen">
+  <div class="results-header">
+    <h2 class="results-title">📊 카드 소팅 인사이트</h2>
+    <p class="results-sub" id="resultsSub"></p>
+  </div>
+  <div class="results-body" id="resultsBody"></div>
+  <div class="results-footer">
+    <button class="btn-back" onclick="goHome()">← 돌아가기</button>
+    <button class="btn-download" onclick="downloadCSV()">📥 CSV 다운로드</button>
+    <button class="btn-download" style="background:var(--primary)" onclick="downloadJSON()">📥 JSON 다운로드</button>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-time" id="modalTime"></div>
+    <div id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-delete" id="modalDeleteBtn">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Mode Switch -->
+<button class="fab-mode mode-review" id="fabMode" onclick="toggleMode()">
+  <span class="fab-icon">📝</span>
+  <span id="fabLabel">리뷰 정보 나누기</span>
+</button>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ===== DATA =====
+  const MODES = {
+    job: {
+      cards: ['직무명','회사명','지역','경력 조건','마감일','핵심 장점 태그','리뷰 기반 언급 수','현직자 비중','학력 조건','기업 이미지/로고','취업축하금','북마크'],
+      icon: '💼',
+      title: '공고 카드 정보',
+      storageKey: 'cardSortResults',
+      sortTitle: '어떤 정보가 가장 중요한가요?',
+      sortDesc: '각 카드를 중요도에 따라 우측 3가지 영역에 넣어주세요. 넣은 순서가 곧 우선순위가 돼요.',
+      refTitle: '📋 공고 카드 예시',
+      refSub: '이런 카드에 들어갈 정보를 분류합니다',
+      fabIcon: '📝', fabLabel: '리뷰 정보 나누기',
+      color: '#00C471'
+    },
+    review: {
+      cards: ['총 만족도','개별 만족도','리뷰 작성 일자','현/전직장 라벨','직무','지역','리뷰 제목','장점','단점','1년 후 기업 성장세','기업 추천 여부','도움이 돼요 수'],
+      icon: '📝',
+      title: '리뷰 정보',
+      storageKey: 'reviewSortResults',
+      sortTitle: '리뷰에서 어떤 정보가 가장 중요한가요?',
+      sortDesc: '각 카드를 중요도에 따라 우측 3가지 영역에 넣어주세요. 넣은 순서가 곧 우선순위가 돼요.',
+      refTitle: '📝 리뷰 카드 예시',
+      refSub: '이런 리뷰에 들어갈 정보를 분류합니다',
+      fabIcon: '💼', fabLabel: '공고 카드 나누기',
+      color: '#6366F1'
+    }
+  };
+
+  let currentMode = 'job';
+  let allResults = JSON.parse(localStorage.getItem(MODES.job.storageKey) || '[]');
+  let currentName = '';
+  let currentSort = { must: [], nice: [], no: [] };
+  let draggedCard = null;
+  let dragSource = null;
+
+  function getCards() { return MODES[currentMode].cards; }
+  function getMode() { return MODES[currentMode]; }
+
+  // ===== INIT =====
+  function init() {
+    applyMode();
+    renderMarquee();
+    renderHistory();
+  }
+
+  function renderMarquee() {
+    const cards = getCards();
+    const wrap = document.getElementById('marqueeWrap');
+    const mid = Math.ceil(cards.length / 2);
+    const row1 = cards.slice(0, mid + 1);
+    const row2 = cards.slice(mid - 2).concat(cards.slice(0, 3));
+    const makeRow = (items) => items.concat(items).map(c => `<span class="preview-chip">${c}</span>`).join('');
+    wrap.innerHTML = `
+      <div class="marquee-row"><div class="marquee-track">${makeRow(row1)}</div></div>
+      <div class="marquee-row marquee-row-2"><div class="marquee-track">${makeRow(row2)}</div></div>
+    `;
+  }
+
+  function switchMode(mode) {
+    currentMode = mode;
+    allResults = JSON.parse(localStorage.getItem(getMode().storageKey) || '[]');
+    applyMode();
+    renderMarquee();
+    renderHistory();
+  }
+
+  function toggleMode() {
+    switchMode(currentMode === 'job' ? 'review' : 'job');
+    goHome();
+  }
+
+  function applyMode() {
+    const m = getMode();
+    // Intro
+    document.getElementById('introIcon').textContent = m.icon;
+    document.getElementById('introTitle').innerHTML = `${m.title}<br><span>나누기 게임</span>`;
+    document.getElementById('introDesc').innerHTML =
+      currentMode === 'job'
+        ? '공고 카드에 어떤 정보가 들어가면 좋을지,<br>중요한 순서대로 분류해주세요.'
+        : '리뷰에서 어떤 정보가 중요한지,<br>중요한 순서대로 분류해주세요.';
+    // FAB
+    const fab = document.getElementById('fabMode');
+    fab.className = 'fab-mode ' + (currentMode === 'job' ? 'mode-review' : 'mode-job');
+    document.getElementById('fabLabel').textContent = m.fabLabel;
+    document.querySelector('.fab-icon').textContent = m.fabIcon;
+  }
+
+  function renderHistory() {
+    const section = document.getElementById('historySection');
+    const list = document.getElementById('historyList');
+
+    if (allResults.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = '';
+    document.getElementById('historyCount').textContent = `(${allResults.length}명)`;
+
+    list.innerHTML = allResults.map((r, i) => {
+      const initials = r.name.slice(0, 1);
+      const date = new Date(r.timestamp);
+      const timeStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+      const mustCount = r.sort.must.length;
+      return `<div class="history-item" onclick="openDetail(${i})">
+        <div class="history-avatar">${initials}</div>
+        <div class="history-info">
+          <div class="history-name">${escapeHtml(r.name)}</div>
+          <div class="history-time">${timeStr} · 필수 ${mustCount}개 선택</div>
+        </div>
+        <div class="history-badge">상세보기 →</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ===== DETAIL MODAL =====
+  function openDetail(idx) {
+    const r = allResults[idx];
+    if (!r) return;
+    const modal = document.getElementById('detailModal');
+    document.getElementById('modalTitle').textContent = `${r.name}님의 분류 결과`;
+    const date = new Date(r.timestamp);
+    document.getElementById('modalTime').textContent =
+      `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')} 참여`;
+
+    const cats = [
+      { key: 'must', label: '✅ 꼭 있어야 해요', cls: 'must' },
+      { key: 'nice', label: '🟡 있으면 좋아요', cls: 'nice' },
+      { key: 'no', label: '❌ 굳이 안 봐요', cls: 'no' }
+    ];
+    let html = '';
+    cats.forEach(cat => {
+      const items = r.sort[cat.key];
+      if (items.length === 0) return;
+      html += `<div class="modal-cat">
+        <div class="modal-cat-title">${cat.label}</div>
+        <div class="modal-cat-chips">`;
+      items.forEach((c, i) => {
+        html += `<div class="modal-chip ${cat.cls}">
+          <span class="modal-chip-rank">${i + 1}</span>
+          ${escapeHtml(c)}
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalDeleteBtn').onclick = () => deleteResult(idx);
+    modal.classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('detailModal').classList.remove('open');
+  }
+
+  function deleteResult(idx) {
+    const name = allResults[idx].name;
+    if (!confirm(`${name}님의 결과를 삭제할까요?`)) return;
+    allResults.splice(idx, 1);
+    localStorage.setItem('cardSortResults', JSON.stringify(allResults));
+    closeModal();
+    renderHistory();
+    showToast(`${name}님의 결과가 삭제되었습니다`);
+  }
+
+  // ===== NAVIGATION =====
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+    if (id === 'name-input') {
+      setTimeout(() => document.getElementById('nameField').focus(), 100);
+    }
+    // FAB only on intro
+    document.getElementById('fabMode').style.display = id === 'intro' ? '' : 'none';
+  }
+
+  function goHome() {
+    renderHistory();
+    showScreen('intro');
+  }
+
+  // Name input
+  document.getElementById('nameField').addEventListener('input', function() {
+    document.getElementById('btnStartSort').disabled = this.value.trim().length === 0;
+  });
+  document.getElementById('nameField').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) startSorting();
+  });
+
+  function startSorting() {
+    currentName = document.getElementById('nameField').value.trim();
+    if (!currentName) return;
+    currentSort = { must: [], nice: [], no: [] };
+    // Apply mode to sorting screen
+    const m = getMode();
+    document.getElementById('sortTitle').textContent = m.sortTitle;
+    document.getElementById('sortDesc').textContent = m.sortDesc;
+    document.getElementById('refPanelTitle').textContent = m.refTitle;
+    document.getElementById('refPanelSub').textContent = m.refSub;
+    document.getElementById('refJobCards').style.display = currentMode === 'job' ? '' : 'none';
+    document.getElementById('refReviewCards').style.display = currentMode === 'review' ? '' : 'none';
+    showScreen('sorting');
+    document.getElementById('sortParticipantBadge').textContent = currentName;
+    renderSortingScreen();
+  }
+
+  // ===== SORTING =====
+  function renderSortingScreen() {
+    const cards = getCards();
+    const unsorted = document.getElementById('unsortedCards');
+    unsorted.innerHTML = '';
+    const shuffled = [...cards].sort(() => Math.random() - 0.5);
+    shuffled.forEach(c => unsorted.appendChild(createChip(c, 'unsorted')));
+
+    ['mustCards','niceCards','noCards'].forEach(id => {
+      document.getElementById(id).innerHTML = '';
+    });
+    updateProgress();
+  }
+
+  function createChip(name, source, rank) {
+    const chip = document.createElement('div');
+    chip.className = 'card-chip';
+    chip.dataset.card = name;
+    chip.dataset.source = source;
+    chip.draggable = true;
+
+    // Rank badge for all categories
+    if (source !== 'unsorted' && rank !== undefined) {
+      const badge = document.createElement('span');
+      const rankClass = source === 'nice' ? ' rank-nice' : source === 'no' ? ' rank-no' : '';
+      badge.className = 'chip-rank' + rankClass;
+      badge.textContent = rank;
+      chip.appendChild(badge);
+    }
+
+    const label = document.createElement('span');
+    label.textContent = name;
+    label.style.flex = '1';
+    chip.appendChild(label);
+
+    // Remove button (only in categories)
+    if (source !== 'unsorted') {
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'chip-remove';
+      removeBtn.innerHTML = '×';
+      removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        removeFromCategory(name);
+      };
+      chip.appendChild(removeBtn);
+    }
+
+    chip.addEventListener('dragstart', (e) => {
+      draggedCard = name;
+      dragSource = source;
+      chip.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', name);
+    });
+    chip.addEventListener('dragend', () => {
+      chip.classList.remove('dragging');
+      draggedCard = null;
+      dragSource = null;
+      // Remove all drag-over states
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    });
+
+    // Touch support
+    chip.addEventListener('touchstart', handleTouchStart, { passive: false });
+    chip.addEventListener('touchmove', handleTouchMove, { passive: false });
+    chip.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return chip;
+  }
+
+  // Touch DnD
+  let touchDragging = null;
+  let touchSource = null;
+  let touchClone = null;
+
+  function handleTouchStart(e) {
+    const chip = e.currentTarget;
+    touchDragging = chip.dataset.card;
+    touchSource = chip.dataset.source;
+    const touch = e.touches[0];
+
+    touchClone = document.createElement('div');
+    touchClone.className = 'card-chip';
+    touchClone.textContent = touchDragging;
+    touchClone.style.cssText = `position:fixed;z-index:10000;pointer-events:none;opacity:0.9;
+      transform:scale(1.05);box-shadow:0 8px 24px rgba(0,0,0,0.15);
+      left:${touch.clientX - 40}px;top:${touch.clientY - 20}px;`;
+    document.body.appendChild(touchClone);
+    chip.style.opacity = '0.3';
+  }
+
+  function handleTouchMove(e) {
+    e.preventDefault();
+    if (!touchClone) return;
+    const touch = e.touches[0];
+    touchClone.style.left = (touch.clientX - 40) + 'px';
+    touchClone.style.top = (touch.clientY - 20) + 'px';
+
+    document.querySelectorAll('.category-zone, .unsorted-cards').forEach(z => {
+      const rect = z.getBoundingClientRect();
+      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+          touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        z.classList.add('drag-over');
+      } else {
+        z.classList.remove('drag-over');
+      }
+    });
+  }
+
+  function handleTouchEnd(e) {
+    if (!touchClone || !touchDragging) return;
+    const touch = e.changedTouches[0];
+    const name = touchDragging;
+    const src = touchSource;
+
+    document.querySelectorAll('.category-zone').forEach(z => {
+      const rect = z.getBoundingClientRect();
+      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+          touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        addToCategory(name, z.dataset.category, src);
+      }
+      z.classList.remove('drag-over');
+    });
+
+    const unsorted = document.getElementById('unsortedCards');
+    const uRect = unsorted.getBoundingClientRect();
+    if (touch.clientX >= uRect.left && touch.clientX <= uRect.right &&
+        touch.clientY >= uRect.top && touch.clientY <= uRect.bottom) {
+      removeFromCategory(name);
+    }
+    unsorted.classList.remove('drag-over');
+
+    const srcChip = document.querySelector(`.card-chip[data-card="${name}"]`);
+    if (srcChip) srcChip.style.opacity = '1';
+    if (touchClone.parentNode) touchClone.remove();
+    touchClone = null;
+    touchDragging = null;
+    touchSource = null;
+  }
+
+  // Drag handlers
+  function dragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    // Highlight the category-zone parent
+    const zone = e.currentTarget.closest ? e.currentTarget.closest('.category-zone') || e.currentTarget : e.currentTarget;
+    zone.classList.add('drag-over');
+  }
+  function dragLeave(e) {
+    e.stopPropagation();
+    const zone = e.currentTarget.closest ? e.currentTarget.closest('.category-zone') || e.currentTarget : e.currentTarget;
+    // Only remove if we're actually leaving the zone
+    const rect = zone.getBoundingClientRect();
+    if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+      zone.classList.remove('drag-over');
+    }
+  }
+
+  function dragOverUnsorted(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  }
+  function dragLeaveUnsorted(e) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+
+  function dropToUnsorted(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    const name = e.dataTransfer.getData('text/plain') || draggedCard;
+    if (name && dragSource !== 'unsorted') {
+      removeFromCategory(name);
+    }
+  }
+
+  function dropCard(e, category) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    const name = e.dataTransfer.getData('text/plain') || draggedCard;
+    if (!name) return;
+
+    // If dropped within must-have, handle reorder
+    if (category === 'must' && dragSource === 'must') {
+      handleMustReorder(e, name);
+      return;
+    }
+
+    addToCategory(name, category, dragSource);
+  }
+
+  function addToCategory(name, category, fromSource) {
+    // Remove from all categories first
+    ['must','nice','no'].forEach(cat => {
+      currentSort[cat] = currentSort[cat].filter(c => c !== name);
+    });
+    currentSort[category].push(name);
+
+    renderAllCards();
+    updateProgress();
+
+    const catLabel = category === 'must' ? '꼭 있어야 해요' : category === 'nice' ? '있으면 좋아요' : '굳이 안 봐요';
+    const rank = category === 'must' ? ` (${currentSort.must.indexOf(name) + 1}순위)` : '';
+    showToast(`"${name}" → ${catLabel}${rank}`);
+  }
+
+  function removeFromCategory(name) {
+    ['must','nice','no'].forEach(cat => {
+      currentSort[cat] = currentSort[cat].filter(c => c !== name);
+    });
+    renderAllCards();
+    updateProgress();
+  }
+
+  function handleMustReorder(e, name) {
+    const container = document.getElementById('mustCards');
+    const chips = [...container.querySelectorAll('.card-chip')];
+    const mouseY = e.clientY;
+
+    // Find insertion index
+    let insertIdx = currentSort.must.length;
+    for (let i = 0; i < chips.length; i++) {
+      const rect = chips[i].getBoundingClientRect();
+      if (mouseY < rect.top + rect.height / 2) {
+        insertIdx = i;
+        break;
+      }
+    }
+
+    // Remove and reinsert
+    const oldIdx = currentSort.must.indexOf(name);
+    currentSort.must.splice(oldIdx, 1);
+    if (insertIdx > oldIdx) insertIdx--;
+    currentSort.must.splice(insertIdx, 0, name);
+
+    renderAllCards();
+    updateProgress();
+    showToast(`"${name}" → ${insertIdx + 1}순위로 변경`);
+  }
+
+  function renderAllCards() {
+    // Find which cards are sorted
+    const sorted = new Set([...currentSort.must, ...currentSort.nice, ...currentSort.no]);
+    const unsortedList = getCards().filter(c => !sorted.has(c));
+
+    // Render unsorted
+    const unsortedEl = document.getElementById('unsortedCards');
+    unsortedEl.innerHTML = '';
+    unsortedList.forEach(c => unsortedEl.appendChild(createChip(c, 'unsorted')));
+
+    // Render must (with rank numbers)
+    const mustEl = document.getElementById('mustCards');
+    mustEl.innerHTML = '';
+    currentSort.must.forEach((c, i) => mustEl.appendChild(createChip(c, 'must', i + 1)));
+
+    // Render nice (with rank numbers)
+    const niceEl = document.getElementById('niceCards');
+    niceEl.innerHTML = '';
+    currentSort.nice.forEach((c, i) => niceEl.appendChild(createChip(c, 'nice', i + 1)));
+
+    // Render no (with rank numbers)
+    const noEl = document.getElementById('noCards');
+    noEl.innerHTML = '';
+    currentSort.no.forEach((c, i) => noEl.appendChild(createChip(c, 'no', i + 1)));
+  }
+
+  function updateProgress() {
+    const sorted = currentSort.must.length + currentSort.nice.length + currentSort.no.length;
+    const total = getCards().length;
+    const pct = (sorted / total) * 100;
+    document.getElementById('sortProgress').style.width = pct + '%';
+    document.getElementById('btnNext').disabled = sorted < total;
+    document.getElementById('progressText').innerHTML = `<b style="color:var(--primary)">${sorted}</b> / ${total}개`;
+  }
+
+  function finishSorting() {
+    const result = {
+      name: currentName,
+      mode: currentMode,
+      sort: JSON.parse(JSON.stringify(currentSort)),
+      priority: [...currentSort.must],
+      timestamp: new Date().toISOString()
+    };
+    allResults.push(result);
+    localStorage.setItem(getMode().storageKey, JSON.stringify(allResults));
+
+    showScreen('done');
+    document.getElementById('doneSub').textContent = `${currentName}님의 분류가 저장되었습니다`;
+    document.getElementById('nameField').value = '';
+    document.getElementById('btnStartSort').disabled = true;
+    spawnConfetti();
+  }
+
+  // ===== RESULTS =====
+  function showResults() {
+    showScreen('results');
+    renderResults();
+  }
+
+  function renderResults() {
+    const body = document.getElementById('resultsBody');
+    const cards = getCards();
+    const m = getMode();
+    const n = allResults.length;
+    document.getElementById('resultsSub').textContent = `${m.title} — ${n}명의 참여자 데이터를 기반으로 분석한 결과입니다`;
+    document.querySelector('.results-title').textContent = `📊 ${m.title} 소팅 인사이트`;
+
+    if (n === 0) { body.innerHTML = '<p style="text-align:center;color:var(--gray-400);padding:40px">아직 데이터가 없습니다.</p>'; return; }
+
+    const catCounts = {};
+    const priorityScores = {};
+
+    cards.forEach(c => {
+      catCounts[c] = { must: 0, nice: 0, no: 0 };
+      priorityScores[c] = [];
+    });
+
+    allResults.forEach(r => {
+      ['must','nice','no'].forEach(cat => {
+        r.sort[cat].forEach(c => { catCounts[c][cat]++; });
+      });
+      r.priority.forEach((c, idx) => {
+        if (!priorityScores[c]) priorityScores[c] = [];
+        priorityScores[c].push(idx + 1);
+      });
+    });
+
+    const sortedByMust = [...cards].sort((a, b) => catCounts[b].must - catCounts[a].must);
+
+    const mustCards = cards.filter(c => catCounts[c].must > 0);
+    const sortedByPriority = mustCards
+      .map(c => ({
+        name: c,
+        avg: priorityScores[c] && priorityScores[c].length > 0
+          ? priorityScores[c].reduce((a,b)=>a+b,0) / priorityScores[c].length : 999,
+        count: priorityScores[c] ? priorityScores[c].length : 0
+      }))
+      .sort((a, b) => a.avg - b.avg);
+
+    const consensus = cards.map(c => {
+      const counts = [catCounts[c].must, catCounts[c].nice, catCounts[c].no];
+      const max = Math.max(...counts);
+      return { name: c, agreement: (max / n * 100).toFixed(0), topCat: ['must','nice','no'][counts.indexOf(max)] };
+    }).sort((a,b) => b.agreement - a.agreement);
+
+    const topMust = sortedByMust.filter(c => catCounts[c].must >= n * 0.5).slice(0, 5);
+    const topNo = sortedByMust.filter(c => catCounts[c].no >= n * 0.5).sort((a,b) => catCounts[b].no - catCounts[a].no);
+
+    let html = '';
+
+    // Insights
+    html += `<div class="result-section"><div class="result-section-title">💡 핵심 인사이트</div><div class="insight-grid">`;
+
+    html += `<div class="insight-card"><div class="insight-emoji">🏆</div>
+      <div class="insight-title">가장 중요한 정보</div>
+      <div class="insight-body">${topMust.length > 0
+        ? `<b>${topMust.join(', ')}</b>이(가) 과반수 이상에게 필수 정보로 선택되었습니다.`
+        : '아직 과반수 합의된 필수 항목이 없습니다.'}</div></div>`;
+
+    if (sortedByPriority.length > 0) {
+      html += `<div class="insight-card"><div class="insight-emoji">🎯</div>
+        <div class="insight-title">우선순위 1위</div>
+        <div class="insight-body"><b>${sortedByPriority[0].name}</b>이(가) 평균 ${sortedByPriority[0].avg.toFixed(1)}순위로 가장 중요한 항목입니다. (${sortedByPriority[0].count}명 응답)</div></div>`;
+    }
+
+    html += `<div class="insight-card"><div class="insight-emoji">🤝</div>
+      <div class="insight-title">가장 합의된 항목</div>
+      <div class="insight-body"><b>${consensus[0].name}</b>에 대해 ${consensus[0].agreement}%가 동일한 분류를 선택했습니다. (${consensus[0].topCat === 'must' ? '꼭 있어야 해요' : consensus[0].topCat === 'nice' ? '있으면 좋아요' : '굳이 안 봐요'})</div></div>`;
+
+    if (topNo.length > 0) {
+      html += `<div class="insight-card"><div class="insight-emoji">🗑️</div>
+        <div class="insight-title">제거 후보</div>
+        <div class="insight-body"><b>${topNo.join(', ')}</b>은(는) 과반수가 불필요하다고 평가했습니다.</div></div>`;
+    }
+    html += `</div></div>`;
+
+    // Distribution
+    html += `<div class="result-section"><div class="result-section-title">📊 카테고리별 분포</div><div class="result-card">`;
+    sortedByMust.forEach((c, i) => {
+      const must = catCounts[c].must, nice = catCounts[c].nice, no = catCounts[c].no;
+      const mustPct = must/n*100, nicePct = nice/n*100, noPct = no/n*100;
+      html += `<div class="result-item">
+        <div class="result-rank ${i<3?'rank-'+(i+1):'rank-default'}">${i+1}</div>
+        <div class="result-name">${c}</div>
+        <div class="result-bar-wrap">
+          <div style="display:flex;gap:2px;flex:1;height:10px;border-radius:5px;overflow:hidden;background:var(--gray-100)">
+            <div style="width:${mustPct}%;background:var(--primary);transition:width 0.6s"></div>
+            <div style="width:${nicePct}%;background:var(--yellow);transition:width 0.6s"></div>
+            <div style="width:${noPct}%;background:var(--red);transition:width 0.6s"></div>
+          </div>
+          <div style="display:flex;gap:8px;min-width:120px;font-size:12px;font-weight:600">
+            <span style="color:var(--primary)">${must}명</span>
+            <span style="color:var(--yellow)">${nice}명</span>
+            <span style="color:var(--red)">${no}명</span>
+          </div>
+        </div></div>`;
+    });
+    html += `</div>
+      <div style="display:flex;gap:16px;margin-top:12px;justify-content:center;font-size:12px;color:var(--gray-400)">
+        <span>✅ 꼭 있어야 해요</span><span>🟡 있으면 좋아요</span><span>❌ 굳이 안 봐요</span>
+      </div></div>`;
+
+    // Priority
+    if (sortedByPriority.length > 0) {
+      html += `<div class="result-section"><div class="result-section-title">⭐ 우선순위 평균 랭킹</div><div class="result-card">`;
+      sortedByPriority.forEach((item, i) => {
+        html += `<div class="priority-result-item">
+          <div class="result-rank ${i<3?'rank-'+(i+1):'rank-default'}">${i+1}</div>
+          <div class="priority-avg">${item.avg.toFixed(1)}</div>
+          <div class="priority-result-name">${item.name}</div>
+          <div class="priority-votes">${item.count}명 응답</div></div>`;
+      });
+      html += `</div></div>`;
+    }
+
+    // Per participant
+    html += `<div class="result-section"><div class="result-section-title">👤 참여자별 응답</div><div class="result-card"><div class="per-participant-grid">`;
+    allResults.forEach(r => {
+      html += `<div class="per-participant-card"><h4>${escapeHtml(r.name)}</h4><div class="tag-list">`;
+      r.sort.must.forEach(c => html += `<span class="mini-tag must">${c}</span>`);
+      r.sort.nice.forEach(c => html += `<span class="mini-tag nice">${c}</span>`);
+      r.sort.no.forEach(c => html += `<span class="mini-tag no">${c}</span>`);
+      html += `</div>`;
+      if (r.priority.length > 0) {
+        html += `<div style="margin-top:8px;font-size:11px;color:var(--gray-400)">우선순위: ${r.priority.join(' > ')}</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div></div></div>`;
+
+    body.innerHTML = html;
+  }
+
+  // ===== EXPORT =====
+  function downloadCSV() {
+    let csv = '\uFEFF';
+    csv += '항목,' + allResults.map(r => `${r.name}_분류`).join(',');
+    csv += ',' + allResults.map(r => `${r.name}_우선순위`).join(',') + '\n';
+    getCards().forEach(card => {
+      let row = card;
+      allResults.forEach(r => {
+        let cat = '';
+        if (r.sort.must.includes(card)) cat = '꼭 있어야 해요';
+        else if (r.sort.nice.includes(card)) cat = '있으면 좋아요';
+        else if (r.sort.no.includes(card)) cat = '굳이 안 봐요';
+        row += ',' + cat;
+      });
+      allResults.forEach(r => {
+        const idx = r.priority.indexOf(card);
+        row += ',' + (idx >= 0 ? (idx + 1) : '-');
+      });
+      csv += row + '\n';
+    });
+    downloadFile(csv, 'card_sorting_results.csv', 'text/csv;charset=utf-8');
+  }
+
+  function downloadJSON() {
+    downloadFile(JSON.stringify(allResults, null, 2), 'card_sorting_results.json', 'application/json');
+  }
+
+  function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // ===== UTILS =====
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  function spawnConfetti() {
+    const colors = ['#00C471','#FFB800','#FF4D4D','#6366F1','#F472B6'];
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.left = Math.random()*100+'vw';
+      p.style.top = '-10px';
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      p.style.animationDelay = Math.random()*0.5+'s';
+      p.style.width = (6+Math.random()*8)+'px';
+      p.style.height = (6+Math.random()*8)+'px';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 2000);
+    }
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // Reset (dev)
+  function resetAll() {
+    if (confirm('모든 데이터를 초기화할까요?')) {
+      localStorage.removeItem('cardSortResults');
+      allResults = [];
+      goHome();
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
