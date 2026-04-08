@@ -684,7 +684,7 @@
   .results-sub { font-size: 14px; color: var(--gray-400); }
 
   .results-body {
-    padding: 32px;
+    padding: 32px 32px 100px;
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
@@ -847,8 +847,9 @@
   .btn-download:hover { background: var(--gray-700); transform: translateY(-2px); }
 
   .results-footer {
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0; right: 0;
     background: white;
     border-top: 1px solid var(--gray-100);
     padding: 16px 32px;
@@ -856,6 +857,7 @@
     z-index: 50;
     box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
   }
+
 
   .btn-back {
     background: none; border: none;
@@ -1589,37 +1591,30 @@
 </div>
 
 <!-- ===== DETAIL VIEW (read-only sorting screen) ===== -->
-<div id="detail-view" class="screen">
+<div id="detail-view" class="screen" style="flex-direction:column;background:var(--gray-50)">
   <div class="sort-header">
     <div class="sort-header-top">
       <div class="sort-header-left">
         <button class="btn-back" onclick="goBackFromDetail()" style="margin-right:4px">←</button>
         <span class="sort-step" id="detailStep">분류 결과</span>
-        <span class="sort-participant-badge" id="detailName"></span>
       </div>
     </div>
-    <h2 class="sort-title" id="detailTitle">분류 결과 상세</h2>
+    <h2 class="sort-title" id="detailTitle"></h2>
     <p class="sort-desc" id="detailTime"></p>
   </div>
-  <div class="sort-layout">
-    <div class="sort-left" id="detailLeft"></div>
-    <div class="sort-right">
-      <div class="categories">
-        <div class="category-zone cat-must">
-          <div class="cat-header"><span class="cat-icon">✅</span><span class="cat-title">꼭 있어야 해요</span></div>
-          <div class="cat-sub">"이 정보 없으면 공고를 안 볼 것 같아요"</div>
-          <div class="cat-cards" id="detailMust"></div>
-        </div>
-        <div class="category-zone cat-nice">
-          <div class="cat-header"><span class="cat-icon">🟡</span><span class="cat-title">있으면 좋아요</span></div>
-          <div class="cat-sub">"있으면 참고하지만, 없어도 괜찮아요"</div>
-          <div class="cat-cards" id="detailNice"></div>
-        </div>
-        <div class="category-zone cat-no">
-          <div class="cat-header"><span class="cat-icon">❌</span><span class="cat-title">굳이 안 봐요</span></div>
-          <div class="cat-sub">"공고 목록에서는 딱히 안 봐요"</div>
-          <div class="cat-cards" id="detailNo"></div>
-        </div>
+  <div style="flex:1;padding:20px 32px;max-width:960px;margin:0 auto;width:100%">
+    <div class="categories">
+      <div class="category-zone cat-must">
+        <div class="cat-header"><span class="cat-icon">✅</span><span class="cat-title">꼭 있어야 해요</span></div>
+        <div class="cat-cards" id="detailMust"></div>
+      </div>
+      <div class="category-zone cat-nice">
+        <div class="cat-header"><span class="cat-icon">🟡</span><span class="cat-title">있으면 좋아요</span></div>
+        <div class="cat-cards" id="detailNice"></div>
+      </div>
+      <div class="category-zone cat-no">
+        <div class="cat-header"><span class="cat-icon">❌</span><span class="cat-title">굳이 안 봐요</span></div>
+        <div class="cat-cards" id="detailNo"></div>
       </div>
     </div>
   </div>
@@ -1893,16 +1888,11 @@
     detailBackScreen = fromScreen || 'results';
     const mode = r.mode || currentMode;
 
-    document.getElementById('detailName').textContent = r.name;
-    document.getElementById('detailStep').textContent = `${r.name}님의 분류 결과`;
+    document.getElementById('detailStep').textContent = '분류 결과';
+    document.getElementById('detailTitle').textContent = `${r.name}님의 분류 결과`;
     const date = new Date(r.timestamp);
     document.getElementById('detailTime').textContent =
       `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')} 참여`;
-
-    // Render left panel (example cards based on mode)
-    const leftEl = document.getElementById('detailLeft');
-    const sortLeft = document.querySelector('#sorting .sort-left');
-    if (sortLeft) leftEl.innerHTML = sortLeft.innerHTML;
 
     // Render read-only cards
     function renderReadonlyCards(containerId, items, catClass) {
