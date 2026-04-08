@@ -1350,6 +1350,7 @@
   <div class="sort-header">
     <div class="sort-header-top">
       <div class="sort-header-left">
+        <button class="btn-back" onclick="goHome()" style="margin-right:4px">←</button>
         <span class="sort-step" id="sortStep">카드 분류</span>
         <span class="sort-participant-badge" id="sortParticipantBadge"></span>
       </div>
@@ -1590,8 +1591,32 @@
     }
   };
 
+  // ===== SHARED STORAGE =====
+  const BLOB_ID = '019d6be0-eb17-7be2-97ca-c5109e1f7e3f';
+  const BLOB_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
+  let sharedData = { job: [], review: [] };
+
+  async function loadSharedData() {
+    try {
+      const res = await fetch(BLOB_URL, { headers: { 'Accept': 'application/json' } });
+      if (res.ok) sharedData = await res.json();
+    } catch (e) { console.warn('Failed to load shared data, using local cache'); }
+    allResults = sharedData[currentMode] || [];
+  }
+
+  async function saveSharedData() {
+    sharedData[currentMode] = allResults;
+    try {
+      await fetch(BLOB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(sharedData)
+      });
+    } catch (e) { console.warn('Failed to save shared data'); }
+  }
+
   let currentMode = 'job';
-  let allResults = JSON.parse(localStorage.getItem(MODES.job.storageKey) || '[]');
+  let allResults = [];
   let currentName = '';
   let currentSort = { must: [], nice: [], no: [] };
   let draggedCard = null;
@@ -1601,7 +1626,8 @@
   function getMode() { return MODES[currentMode]; }
 
   // ===== INIT =====
-  function init() {
+  async function init() {
+    await loadSharedData();
     applyMode();
     renderMarquee();
     renderHistory();
@@ -1620,9 +1646,9 @@
     `;
   }
 
-  function switchMode(mode) {
+  async function switchMode(mode) {
     currentMode = mode;
-    allResults = JSON.parse(localStorage.getItem(getMode().storageKey) || '[]');
+    await loadSharedData();
     applyMode();
     renderMarquee();
     renderHistory();
@@ -1717,11 +1743,11 @@
     document.getElementById('detailModal').classList.remove('open');
   }
 
-  function deleteResult(idx) {
+  async function deleteResult(idx) {
     const name = allResults[idx].name;
     if (!confirm(`${name}님의 결과를 삭제할까요?`)) return;
     allResults.splice(idx, 1);
-    localStorage.setItem('cardSortResults', JSON.stringify(allResults));
+    await saveSharedData();
     closeModal();
     renderHistory();
     showToast(`${name}님의 결과가 삭제되었습니다`);
@@ -1739,7 +1765,8 @@
     document.getElementById('fabMode').style.display = id === 'intro' ? '' : 'none';
   }
 
-  function goHome() {
+  async function goHome() {
+    await loadSharedData();
     renderHistory();
     showScreen('intro');
   }
@@ -2043,7 +2070,7 @@
     document.getElementById('progressText').innerHTML = `<b style="color:var(--primary)">${sorted}</b> / ${total}개`;
   }
 
-  function finishSorting() {
+  async function finishSorting() {
     const result = {
       name: currentName,
       mode: currentMode,
@@ -2051,8 +2078,10 @@
       priority: [...currentSort.must],
       timestamp: new Date().toISOString()
     };
+    // Reload latest data first to avoid overwriting others
+    await loadSharedData();
     allResults.push(result);
-    localStorage.setItem(getMode().storageKey, JSON.stringify(allResults));
+    await saveSharedData();
 
     showScreen('done');
     document.getElementById('doneSub').textContent = `${currentName}님의 분류가 저장되었습니다`;
@@ -2062,8 +2091,9 @@
   }
 
   // ===== RESULTS =====
-  function showResults() {
+  async function showResults() {
     showScreen('results');
+    await loadSharedData();
     renderResults();
   }
 
@@ -2269,10 +2299,10 @@
   }
 
   // Reset (dev)
-  function resetAll() {
+  async function resetAll() {
     if (confirm('모든 데이터를 초기화할까요?')) {
-      localStorage.removeItem('cardSortResults');
       allResults = [];
+      await saveSharedData();
       goHome();
     }
   }
