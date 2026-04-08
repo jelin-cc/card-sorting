@@ -409,6 +409,7 @@
     flex: 1;
     padding: 20px 28px;
     min-width: 0;
+    background: var(--gray-100);
   }
 
   .ref-panel-title {
@@ -1928,9 +1929,18 @@
     const name = allResults[idx].name;
     if (!confirm(`${name}님의 결과를 삭제할까요?`)) return;
     allResults.splice(idx, 1);
-    await saveSharedData();
+    sharedData[currentMode] = allResults;
+    setLocal(sharedData);
+    try {
+      await fetch(API_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sharedData)
+      });
+    } catch(e) { console.warn('서버 저장 실패'); }
     closeModal();
     renderHistory();
+    renderResults();
     showToast(`${name}님의 결과가 삭제되었습니다`);
   }
 
@@ -2255,7 +2265,11 @@
     document.getElementById('progressText').innerHTML = `<b style="color:var(--primary)">${sorted}</b> / ${total}개`;
   }
 
+  let _saving = false;
   async function finishSorting() {
+    if (_saving) return;
+    _saving = true;
+    document.getElementById('btnNext').disabled = true;
     const result = {
       name: currentName,
       mode: currentMode,
@@ -2267,6 +2281,7 @@
     await loadSharedData();
     allResults.push(result);
     await saveSharedData();
+    _saving = false;
 
     showScreen('done');
     document.getElementById('doneSub').textContent = `${currentName}님의 분류가 저장되었습니다`;
