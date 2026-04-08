@@ -738,7 +738,7 @@
   .priority-result-item:last-child { border-bottom: none; }
 
   .priority-avg {
-    font-size: 24px; font-weight: 800; color: var(--primary); min-width: 48px;
+    font-size: 14px; font-weight: 700; color: var(--primary); min-width: 90px;
   }
 
   .priority-result-name { flex: 1; font-size: 15px; font-weight: 600; }
@@ -750,7 +750,7 @@
 
   .insight-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 
@@ -766,34 +766,77 @@
   .insight-body { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
   .insight-body b { color: var(--primary); font-weight: 700; }
 
-  .per-participant-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px; margin-top: 12px;
+  /* Participant list in results */
+  .participant-list { margin-top: 12px; }
+
+  .participant-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    transition: background 0.1s;
   }
 
-  .per-participant-card {
-    background: var(--gray-50);
-    border-radius: var(--radius-sm);
-    padding: 16px;
+  .participant-row:last-child { border-bottom: none; }
+  .participant-row:hover { background: var(--gray-50); }
+
+  .participant-avatar {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: var(--primary);
+    flex-shrink: 0;
   }
 
-  .per-participant-card h4 {
-    font-size: 14px; font-weight: 700;
-    margin-bottom: 8px; color: var(--gray-600);
+  .participant-info { flex: 1; min-width: 0; }
+
+  .participant-name { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+
+  .participant-meta { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+  .participant-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .btn-sm {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    transition: all 0.15s;
   }
 
-  .per-participant-card .tag-list {
-    display: flex; flex-wrap: wrap; gap: 6px;
+  .btn-sm-primary {
+    background: var(--primary-light);
+    color: var(--primary-dark);
   }
 
-  .mini-tag {
-    font-size: 12px; padding: 4px 10px;
-    border-radius: 6px; font-weight: 600;
+  .btn-sm-primary:hover { background: var(--primary); color: white; }
+
+  .btn-sm-danger {
+    background: var(--red-light);
+    color: var(--red);
   }
-  .mini-tag.must { background: var(--primary-light); color: #00A85E; }
-  .mini-tag.nice { background: var(--yellow-light); color: #CC9300; }
-  .mini-tag.no { background: var(--red-light); color: #E63E3E; }
+
+  .btn-sm-danger:hover { background: var(--red); color: white; }
+
+  /* Read-only chip in detail view */
+  .chip-readonly {
+    padding: 10px 16px;
+    background: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
 
   .btn-download {
     background: var(--gray-900); color: white; border: none;
@@ -1539,6 +1582,43 @@
   </div>
 </div>
 
+<!-- ===== DETAIL VIEW (read-only sorting screen) ===== -->
+<div id="detail-view" class="screen">
+  <div class="sort-header">
+    <div class="sort-header-top">
+      <div class="sort-header-left">
+        <button class="btn-back" onclick="goBackFromDetail()" style="margin-right:4px">←</button>
+        <span class="sort-step" id="detailStep">분류 결과</span>
+        <span class="sort-participant-badge" id="detailName"></span>
+      </div>
+    </div>
+    <h2 class="sort-title" id="detailTitle">분류 결과 상세</h2>
+    <p class="sort-desc" id="detailTime"></p>
+  </div>
+  <div class="sort-layout">
+    <div class="sort-left" id="detailLeft"></div>
+    <div class="sort-right">
+      <div class="categories">
+        <div class="category-zone cat-must">
+          <div class="cat-header"><span class="cat-icon">✅</span><span class="cat-title">꼭 있어야 해요</span></div>
+          <div class="cat-sub">"이 정보 없으면 공고를 안 볼 것 같아요"</div>
+          <div class="cat-cards" id="detailMust"></div>
+        </div>
+        <div class="category-zone cat-nice">
+          <div class="cat-header"><span class="cat-icon">🟡</span><span class="cat-title">있으면 좋아요</span></div>
+          <div class="cat-sub">"있으면 참고하지만, 없어도 괜찮아요"</div>
+          <div class="cat-cards" id="detailNice"></div>
+        </div>
+        <div class="category-zone cat-no">
+          <div class="cat-header"><span class="cat-icon">❌</span><span class="cat-title">굳이 안 봐요</span></div>
+          <div class="cat-sub">"공고 목록에서는 딱히 안 봐요"</div>
+          <div class="cat-cards" id="detailNo"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Detail Modal -->
 <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
@@ -1680,6 +1760,12 @@
     applyMode();
     renderMarquee();
     renderHistory();
+    // Restore screen on refresh
+    const saved = sessionStorage.getItem('currentScreen');
+    if (saved && saved !== 'intro') {
+      if (saved === 'results') showResults();
+      else showScreen(saved);
+    }
   }
 
   function renderMarquee() {
@@ -1741,7 +1827,7 @@
       const date = new Date(r.timestamp);
       const timeStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
       const mustCount = r.sort.must.length;
-      return `<div class="history-item" onclick="openDetail(${i})">
+      return `<div class="history-item" onclick="showDetailView(${i},'intro')">
         <div class="history-avatar">${initials}</div>
         <div class="history-info">
           <div class="history-name">${escapeHtml(r.name)}</div>
@@ -1792,6 +1878,56 @@
     document.getElementById('detailModal').classList.remove('open');
   }
 
+  // ===== DETAIL VIEW (read-only sorting screen) =====
+  let detailBackScreen = 'results';
+
+  function showDetailView(idx, fromScreen) {
+    const r = allResults[idx];
+    if (!r) return;
+    detailBackScreen = fromScreen || 'results';
+    const mode = r.mode || currentMode;
+
+    document.getElementById('detailName').textContent = r.name;
+    document.getElementById('detailStep').textContent = `${r.name}님의 분류 결과`;
+    const date = new Date(r.timestamp);
+    document.getElementById('detailTime').textContent =
+      `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')} 참여`;
+
+    // Render left panel (example cards based on mode)
+    const leftEl = document.getElementById('detailLeft');
+    const sortLeft = document.querySelector('#sorting .sort-left');
+    if (sortLeft) leftEl.innerHTML = sortLeft.innerHTML;
+
+    // Render read-only cards
+    function renderReadonlyCards(containerId, items, catClass) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      items.forEach((c, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip-readonly';
+        const badge = document.createElement('span');
+        const rankCls = catClass === 'nice' ? ' rank-nice' : catClass === 'no' ? ' rank-no' : '';
+        badge.className = 'chip-rank' + rankCls;
+        badge.textContent = i + 1;
+        chip.appendChild(badge);
+        const label = document.createElement('span');
+        label.textContent = c;
+        chip.appendChild(label);
+        el.appendChild(chip);
+      });
+    }
+
+    renderReadonlyCards('detailMust', r.sort.must, 'must');
+    renderReadonlyCards('detailNice', r.sort.nice, 'nice');
+    renderReadonlyCards('detailNo', r.sort.no, 'no');
+
+    showScreen('detail-view');
+  }
+
+  function goBackFromDetail() {
+    showScreen(detailBackScreen);
+  }
+
   async function deleteResult(idx) {
     const name = allResults[idx].name;
     if (!confirm(`${name}님의 결과를 삭제할까요?`)) return;
@@ -1812,6 +1948,10 @@
     }
     // FAB only on intro
     document.getElementById('fabMode').style.display = id === 'intro' ? '' : 'none';
+    // Save current screen for refresh persistence
+    if (['intro','results'].includes(id)) {
+      sessionStorage.setItem('currentScreen', id);
+    }
   }
 
   async function goHome() {
@@ -2251,29 +2391,35 @@
 
     // Priority
     if (sortedByPriority.length > 0) {
-      html += `<div class="result-section"><div class="result-section-title">⭐ 우선순위 평균 랭킹</div><div class="result-card">`;
+      html += `<div class="result-section"><div class="result-section-title">⭐ "꼭 있어야 해요" 우선순위 평균</div><div class="result-card">
+        <div style="font-size:12px;color:var(--gray-400);margin-bottom:12px">숫자가 낮을수록 더 중요하게 평가된 항목입니다 (1순위에 가까움)</div>`;
       sortedByPriority.forEach((item, i) => {
         html += `<div class="priority-result-item">
           <div class="result-rank ${i<3?'rank-'+(i+1):'rank-default'}">${i+1}</div>
-          <div class="priority-avg">${item.avg.toFixed(1)}</div>
+          <div class="priority-avg">평균 ${item.avg.toFixed(1)}순위</div>
           <div class="priority-result-name">${item.name}</div>
           <div class="priority-votes">${item.count}명 응답</div></div>`;
       });
       html += `</div></div>`;
     }
 
-    // Per participant
-    html += `<div class="result-section"><div class="result-section-title">👤 참여자별 응답</div><div class="result-card"><div class="per-participant-grid">`;
-    allResults.forEach(r => {
-      html += `<div class="per-participant-card"><h4>${escapeHtml(r.name)}</h4><div class="tag-list">`;
-      r.sort.must.forEach(c => html += `<span class="mini-tag must">${c}</span>`);
-      r.sort.nice.forEach(c => html += `<span class="mini-tag nice">${c}</span>`);
-      r.sort.no.forEach(c => html += `<span class="mini-tag no">${c}</span>`);
-      html += `</div>`;
-      if (r.priority.length > 0) {
-        html += `<div style="margin-top:8px;font-size:11px;color:var(--gray-400)">우선순위: ${r.priority.join(' > ')}</div>`;
-      }
-      html += `</div>`;
+    // Per participant list
+    html += `<div class="result-section"><div class="result-section-title">👤 참여자별 응답 (${n}명)</div><div class="result-card"><div class="participant-list">`;
+    allResults.forEach((r, i) => {
+      const date = new Date(r.timestamp);
+      const timeStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+      const mustN = r.sort.must.length, niceN = r.sort.nice.length, noN = r.sort.no.length;
+      html += `<div class="participant-row">
+        <div class="participant-avatar">${escapeHtml(r.name.slice(0,1))}</div>
+        <div class="participant-info">
+          <div class="participant-name">${escapeHtml(r.name)}</div>
+          <div class="participant-meta">${timeStr} · 필수 ${mustN}개 · 참고 ${niceN}개 · 불필요 ${noN}개</div>
+        </div>
+        <div class="participant-actions">
+          <button class="btn-sm btn-sm-primary" onclick="showDetailView(${i},'results')">상세</button>
+          <button class="btn-sm btn-sm-danger" onclick="deleteResult(${i})">삭제</button>
+        </div>
+      </div>`;
     });
     html += `</div></div></div>`;
 
