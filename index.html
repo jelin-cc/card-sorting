@@ -1591,28 +1591,52 @@
     }
   };
 
-  // ===== SHARED STORAGE =====
+  // ===== SHARED STORAGE (cloud + localStorage 이중 저장) =====
   const BLOB_ID = '019d6be0-eb17-7be2-97ca-c5109e1f7e3f';
   const BLOB_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
-  let sharedData = { job: [], review: [] };
+  const LOCAL_KEY = 'cardSort_shared';
+  let sharedData = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{"job":[],"review":[]}');
 
   async function loadSharedData() {
+    // 1) 로컬 캐시 즉시 반영 (빠른 로딩)
+    const local = localStorage.getItem(LOCAL_KEY);
+    if (local) { try { sharedData = JSON.parse(local); } catch(e){} }
+    allResults = sharedData[currentMode] || [];
+
+    // 2) 서버에서 최신 데이터 가져와서 병합
     try {
       const res = await fetch(BLOB_URL, { headers: { 'Accept': 'application/json' } });
-      if (res.ok) sharedData = await res.json();
-    } catch (e) { console.warn('Failed to load shared data, using local cache'); }
-    allResults = sharedData[currentMode] || [];
+      if (res.ok) {
+        const remote = await res.json();
+        // 서버 데이터와 로컬 데이터 병합 (timestamp 기준 중복 제거)
+        ['job','review'].forEach(mode => {
+          const merged = [...(remote[mode]||[])];
+          (sharedData[mode]||[]).forEach(local => {
+            if (!merged.find(r => r.timestamp === local.timestamp && r.name === local.name)) {
+              merged.push(local);
+            }
+          });
+          merged.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+          sharedData[mode] = merged;
+        });
+        allResults = sharedData[currentMode] || [];
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(sharedData));
+      }
+    } catch (e) { console.warn('서버 연결 실패, 로컬 캐시 사용'); }
   }
 
   async function saveSharedData() {
     sharedData[currentMode] = allResults;
+    // 로컬 즉시 저장
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(sharedData));
+    // 서버에도 저장
     try {
       await fetch(BLOB_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(sharedData)
       });
-    } catch (e) { console.warn('Failed to save shared data'); }
+    } catch (e) { console.warn('서버 저장 실패, 로컬에만 저장됨'); }
   }
 
   let currentMode = 'job';
