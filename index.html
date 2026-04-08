@@ -1595,74 +1595,82 @@
   const BLOB_ID = '019d6be0-eb17-7be2-97ca-c5109e1f7e3f';
   const BLOB_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
   const LOCAL_KEY = 'cardSort_shared';
-  let sharedData = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{"job":[],"review":[]}');
 
-  // 고유 ID 생성 (중복 방지용)
-  function resultId(r) { return `${r.name}__${r.timestamp}`; }
-
-  async function loadSharedData() {
-    // 1) 로컬 캐시 즉시 반영
-    try {
-      const cached = localStorage.getItem(LOCAL_KEY);
-      if (cached) sharedData = JSON.parse(cached);
-    } catch(e){}
-    allResults = sharedData[currentMode] || [];
-
-    // 2) 서버에서 최신 데이터 가져와서 병합 (절대 데이터를 줄이지 않음)
-    try {
-      const res = await fetch(BLOB_URL, { headers: { 'Accept': 'application/json' } });
-      if (res.ok) {
-        const remote = await res.json();
-        ['job','review'].forEach(mode => {
-          const localArr = sharedData[mode] || [];
-          const remoteArr = remote[mode] || [];
-          // 합집합: 로컬 + 리모트 중복 제거
-          const idSet = new Set();
-          const merged = [];
-          [...localArr, ...remoteArr].forEach(r => {
-            const id = resultId(r);
-            if (!idSet.has(id)) { idSet.add(id); merged.push(r); }
-          });
-          merged.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-          sharedData[mode] = merged;
-        });
-        allResults = sharedData[currentMode] || [];
-        localStorage.setItem(LOCAL_KEY, JSON.stringify(sharedData));
-      }
-    } catch (e) { console.warn('서버 연결 실패, 로컬 캐시 사용'); }
+  function getLocal() {
+    try { return JSON.parse(localStorage.getItem(LOCAL_KEY)) || {job:[],review:[]}; }
+    catch(e) { return {job:[],review:[]}; }
   }
 
-  async function saveSharedData() {
-    sharedData[currentMode] = allResults;
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(sharedData));
-    // 서버 저장 전 최신 데이터 병합 (다른 사람 데이터 보호)
+  function setLocal(data) {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
+  }
+
+  function resultId(r) { return r.name + '__' + r.timestamp; }
+
+  function mergeArrays(a, b) {
+    const idSet = new Set();
+    const merged = [];
+    [...a, ...b].forEach(r => {
+      const id = resultId(r);
+      if (!idSet.has(id)) { idSet.add(id); merged.push(r); }
+    });
+    return merged.sort((x,y) => new Date(x.timestamp) - new Date(y.timestamp));
+  }
+
+  async function fetchRemote() {
     try {
-      const res = await fetch(BLOB_URL, { headers: { 'Accept': 'application/json' } });
-      if (res.ok) {
-        const remote = await res.json();
-        ['job','review'].forEach(mode => {
-          const idSet = new Set();
-          const merged = [];
-          [...(sharedData[mode]||[]), ...(remote[mode]||[])].forEach(r => {
-            const id = resultId(r);
-            if (!idSet.has(id)) { idSet.add(id); merged.push(r); }
-          });
-          merged.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-          sharedData[mode] = merged;
-        });
-        allResults = sharedData[currentMode] || [];
-        localStorage.setItem(LOCAL_KEY, JSON.stringify(sharedData));
-      }
-    } catch(e){}
-    // 병합된 최종 데이터를 서버에 저장
+      const res = await fetch(BLOB_URL, { headers: {'Accept':'application/json'}, cache: 'no-store' });
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return null;
+  }
+
+  async function pushRemote(data) {
     try {
       await fetch(BLOB_URL, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(sharedData)
+        headers: {'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify(data)
       });
-    } catch (e) { console.warn('서버 저장 실패, 로컬에만 저장됨'); }
+      return true;
+    } catch(e) { return false; }
   }
+
+  async function loadSharedData() {
+    // 로컬에서 즉시 로딩
+    sharedData = getLocal();
+    allResults = sharedData[currentMode] || [];
+
+    // 서버에서 가져와서 합치기 (합집합, 절대 줄이지 않음)
+    const remote = await fetchRemote();
+    if (remote) {
+      ['job','review'].forEach(mode => {
+        sharedData[mode] = mergeArrays(sharedData[mode]||[], remote[mode]||[]);
+      });
+      setLocal(sharedData);
+      allResults = sharedData[currentMode] || [];
+    }
+  }
+
+  async function saveSharedData() {
+    // 1) 로컬 즉시 저장
+    sharedData[currentMode] = allResults;
+    setLocal(sharedData);
+
+    // 2) 서버 최신 데이터 가져와서 합친 후 저장
+    const remote = await fetchRemote();
+    if (remote) {
+      ['job','review'].forEach(mode => {
+        sharedData[mode] = mergeArrays(sharedData[mode]||[], remote[mode]||[]);
+      });
+    }
+    // 3) 합친 결과를 서버 + 로컬 둘 다 저장
+    allResults = sharedData[currentMode] || [];
+    setLocal(sharedData);
+    await pushRemote(sharedData);
+  }
+
+  let sharedData = getLocal();
 
   let currentMode = 'job';
   let allResults = [];
