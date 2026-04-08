@@ -1321,7 +1321,7 @@
   <h1 class="intro-title" id="introTitle">공고 카드 정보<br><span>나누기 게임</span></h1>
   <p class="intro-desc" id="introDesc">
     공고 카드에 어떤 정보가 들어가면 좋을지,<br>
-    중요한 순서대로 분류해주세요.
+    중요한 순서대로 분류하는 게임입니다.
   </p>
 
   <div class="marquee-outer" id="marqueeWrap"></div>
@@ -1666,8 +1666,8 @@
     document.getElementById('introTitle').innerHTML = `${m.title}<br><span>나누기 게임</span>`;
     document.getElementById('introDesc').innerHTML =
       currentMode === 'job'
-        ? '공고 카드에 어떤 정보가 들어가면 좋을지,<br>중요한 순서대로 분류해주세요.'
-        : '리뷰에서 어떤 정보가 중요한지,<br>중요한 순서대로 분류해주세요.';
+        ? '공고 카드에 어떤 정보가 들어가면 좋을지,<br>중요한 순서대로 분류하는 게임입니다.'
+        : '리뷰에서 어떤 정보가 중요한지,<br>중요한 순서대로 분류하는 게임입니다.';
     // FAB
     const fab = document.getElementById('fabMode');
     fab.className = 'fab-mode ' + (currentMode === 'job' ? 'mode-review' : 'mode-job');
