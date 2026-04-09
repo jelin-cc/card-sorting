@@ -318,7 +318,7 @@
   /* ===== SORTING ===== */
   #sorting {
     flex-direction: column;
-    background: var(--gray-50);
+    background: white;
   }
 
   .sort-header {
@@ -385,8 +385,9 @@
   .sort-hero {
     max-width: 1060px;
     margin: 0 auto;
-    padding: 36px 32px 8px;
+    padding: 36px 32px 12px;
     background: white;
+    text-align: center;
   }
 
   .sort-hero-title {
@@ -413,21 +414,23 @@
   .sort-layout {
     flex: 1;
     display: flex;
-    gap: 20px;
+    gap: 0;
     width: 100%;
     max-width: 1060px;
     margin: 0 auto;
     padding: 20px 32px 40px;
-    background: white;
   }
 
   .sort-left {
     width: 420px;
     flex-shrink: 0;
+    padding-right: 24px;
+    border-right: 1px solid var(--gray-200);
   }
 
   .sort-right {
     flex: 1;
+    padding-left: 24px;
     min-width: 0;
   }
 
@@ -695,13 +698,40 @@
 
   .results-header {
     background: white;
-    padding: 32px;
+    padding: 32px 32px 0;
     text-align: center;
-    border-bottom: 1px solid var(--gray-100);
   }
 
   .results-title { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
   .results-sub { font-size: 14px; color: var(--gray-400); }
+
+  .results-tabs {
+    display: flex;
+    gap: 0;
+    margin-top: 24px;
+    border-bottom: 1px solid var(--gray-200);
+    justify-content: center;
+  }
+
+  .results-tab {
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-400);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .results-tab:hover { color: var(--gray-600); }
+
+  .results-tab.active {
+    color: var(--gray-900);
+    border-bottom-color: var(--gray-900);
+  }
 
   .results-body {
     padding: 32px 32px 100px;
@@ -1786,8 +1816,13 @@
   <div class="results-header">
     <h2 class="results-title">📊 카드 소팅 인사이트</h2>
     <p class="results-sub" id="resultsSub"></p>
+    <div class="results-tabs">
+      <button class="results-tab active" onclick="switchResultTab('dashboard',this)">대시보드</button>
+      <button class="results-tab" onclick="switchResultTab('participants',this)">참여자 목록</button>
+    </div>
   </div>
   <div class="results-body" id="resultsBody"></div>
+  <div class="results-body" id="resultsParticipants" style="display:none"></div>
   <div class="results-footer">
     <button class="btn-back" onclick="goHome()">← 돌아가기</button>
     <button class="btn-download" onclick="downloadCSV()">📥 CSV 다운로드</button>
@@ -1803,6 +1838,7 @@
         <button class="btn-back" onclick="goBackFromDetail()" style="margin-right:4px">←</button>
         <span class="sort-step" id="detailStep">분류 결과</span>
       </div>
+      <button class="btn-delete" id="detailDeleteBtn" style="font-size:12px;padding:6px 16px">삭제하기</button>
     </div>
   </div>
   <div class="sort-hero">
@@ -2174,6 +2210,7 @@
     right += '</div>';
 
     container.innerHTML = left + right;
+    document.getElementById('detailDeleteBtn').onclick = () => deleteResult(idx);
     showScreen('detail-view');
   }
 
@@ -2197,6 +2234,10 @@
     closeModal();
     renderHistory();
     renderResults();
+    // If on detail view, go back
+    if (document.getElementById('detail-view').classList.contains('active')) {
+      goBackFromDetail();
+    }
     showToast(`${name}님의 결과가 삭제되었습니다`);
   }
 
@@ -2560,180 +2601,170 @@
   }
 
   // ===== RESULTS =====
+  function switchResultTab(tab, btn) {
+    document.querySelectorAll('.results-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('resultsBody').style.display = tab === 'dashboard' ? '' : 'none';
+    document.getElementById('resultsParticipants').style.display = tab === 'participants' ? '' : 'none';
+  }
+
   async function showResults() {
     showScreen('results');
     await loadSharedData();
     renderResults();
+    // Reset to dashboard tab
+    const tabs = document.querySelectorAll('.results-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    tabs[0].classList.add('active');
+    document.getElementById('resultsBody').style.display = '';
+    document.getElementById('resultsParticipants').style.display = 'none';
   }
 
   function renderResults() {
     const body = document.getElementById('resultsBody');
-    const cards = getCards();
     const m = getMode();
     const n = allResults.length;
-    document.getElementById('resultsSub').textContent = `${m.title} — ${n}명의 참여자 데이터를 기반으로 분석한 결과입니다`;
+    document.getElementById('resultsSub').textContent = `${n}명의 참여자 데이터를 기반으로 분석한 결과입니다`;
     document.querySelector('.results-title').textContent = `📊 ${m.title} 소팅 인사이트`;
 
-    if (n === 0) { body.innerHTML = '<p style="text-align:center;color:var(--gray-400);padding:40px">아직 데이터가 없습니다.</p>'; return; }
+    if (n === 0) {
+      body.innerHTML = `<div style="text-align:center;padding:80px 20px">
+        <div style="font-size:48px;margin-bottom:16px">📭</div>
+        <div style="font-size:18px;font-weight:700;color:var(--gray-700);margin-bottom:8px">아직 참여자가 없습니다</div>
+        <div style="font-size:14px;color:var(--gray-400)">카드 분류를 시작해보세요</div>
+      </div>`;
+      return;
+    }
+
+    // Collect all card names from actual data (handles old/new card names)
+    const allCardNames = new Set();
+    allResults.forEach(r => {
+      (r.priority || []).forEach(c => allCardNames.add(c));
+      ['must','nice','no'].forEach(cat => (r.sort[cat]||[]).forEach(c => allCardNames.add(c)));
+    });
+    const cards = [...allCardNames];
 
     const catCounts = {};
     const priorityScores = {};
-
-    cards.forEach(c => {
-      catCounts[c] = { must: 0, nice: 0, no: 0 };
-      priorityScores[c] = [];
-    });
+    cards.forEach(c => { catCounts[c] = { must:0, nice:0, no:0 }; priorityScores[c] = []; });
 
     allResults.forEach(r => {
       ['must','nice','no'].forEach(cat => {
-        r.sort[cat].forEach(c => { catCounts[c][cat]++; });
+        (r.sort[cat]||[]).forEach(c => { if (catCounts[c]) catCounts[c][cat]++; });
       });
-      r.priority.forEach((c, idx) => {
-        if (!priorityScores[c]) priorityScores[c] = [];
-        priorityScores[c].push(idx + 1);
+      (r.priority||[]).forEach((c, idx) => {
+        if (priorityScores[c]) priorityScores[c].push(idx + 1);
       });
     });
 
-    const sortedByMust = [...cards].sort((a, b) => catCounts[b].must - catCounts[a].must);
-
-    const mustCards = cards.filter(c => catCounts[c].must > 0);
-    const sortedByPriority = mustCards
+    // Priority ranking (avg rank, lower = more important)
+    const ranked = cards.filter(c => priorityScores[c].length > 0)
       .map(c => ({
         name: c,
-        avg: priorityScores[c] && priorityScores[c].length > 0
-          ? priorityScores[c].reduce((a,b)=>a+b,0) / priorityScores[c].length : 999,
-        count: priorityScores[c] ? priorityScores[c].length : 0
+        avg: priorityScores[c].reduce((a,b)=>a+b,0) / priorityScores[c].length,
+        count: priorityScores[c].length,
+        mustPct: Math.round(catCounts[c].must / n * 100)
       }))
       .sort((a, b) => a.avg - b.avg);
 
-    const consensus = cards.map(c => {
-      const counts = [catCounts[c].must, catCounts[c].nice, catCounts[c].no];
-      const max = Math.max(...counts);
-      return { name: c, agreement: (max / n * 100).toFixed(0), topCat: ['must','nice','no'][counts.indexOf(max)] };
-    }).sort((a,b) => b.agreement - a.agreement);
-
-    const topMust = sortedByMust.filter(c => catCounts[c].must >= n * 0.5).slice(0, 5);
-    const topNo = sortedByMust.filter(c => catCounts[c].no >= n * 0.5).sort((a,b) => catCounts[b].no - catCounts[a].no);
-
     let html = '';
 
-    // ===== Toss-style Summary Cards =====
-    // Top 3 must-haves with bar
-    const top3 = sortedByMust.slice(0, 3);
-    html += `<div class="result-section"><div class="result-section-title">🏆 필수 정보 TOP 3</div>`;
-    html += `<div style="display:flex;gap:12px">`;
-    top3.forEach((c, i) => {
-      const pct = Math.round(catCounts[c].must / n * 100);
+    // ===== 1. Summary Stats Row =====
+    const avgCards = allResults.reduce((s,r) => s + (r.priority||[]).length, 0) / n;
+    html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px">
+      <div class="result-card" style="text-align:center;padding:20px">
+        <div style="font-size:28px;font-weight:800;color:var(--gray-900)">${n}명</div>
+        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">총 참여자</div>
+      </div>
+      <div class="result-card" style="text-align:center;padding:20px">
+        <div style="font-size:28px;font-weight:800;color:var(--primary)">${avgCards.toFixed(1)}개</div>
+        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">평균 선택 카드 수</div>
+      </div>
+      <div class="result-card" style="text-align:center;padding:20px">
+        <div style="font-size:28px;font-weight:800;color:var(--red)">${ranked.length > 0 ? ranked[0].name : '-'}</div>
+        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">가장 중요한 정보 1위</div>
+      </div>
+    </div>`;
+
+    // ===== 2. Priority Ranking (Hero) =====
+    html += `<div class="result-section"><div class="result-section-title">우선순위 종합 랭킹</div>
+      <div style="font-size:13px;color:var(--gray-400);margin:-12px 0 16px">평균 순위가 낮을수록 더 중요하게 평가된 정보입니다</div>
+      <div class="result-card" style="padding:0;overflow:hidden">`;
+    ranked.forEach((item, i) => {
+      const barW = Math.max(8, 100 - (item.avg - 1) * 15);
+      const isTop3 = i < 3;
       const medals = ['🥇','🥈','🥉'];
-      html += `<div class="result-card" style="flex:1;text-align:center;padding:20px">
-        <div style="font-size:32px;margin-bottom:8px">${medals[i]}</div>
-        <div style="font-size:16px;font-weight:800;color:var(--gray-800);margin-bottom:4px">${c}</div>
-        <div style="font-size:28px;font-weight:800;color:var(--primary)">${pct}%</div>
-        <div style="font-size:12px;color:var(--gray-400)">${catCounts[c].must}명이 필수로 선택</div>
+      html += `<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;${i < ranked.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''}">
+        <div style="width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:${isTop3?'18px':'14px'};font-weight:800;flex-shrink:0;${isTop3?'background:var(--red-light);color:var(--red)':'background:var(--gray-100);color:var(--gray-500)'}">${isTop3 ? medals[i] : i+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:var(--gray-900)">${item.name}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <div style="flex:1;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
+              <div style="width:${barW}%;height:100%;background:${isTop3?'var(--red)':'var(--gray-300)'};border-radius:3px;transition:width 0.6s"></div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:16px;font-weight:800;color:${isTop3?'var(--red)':'var(--gray-500)'}">평균 ${item.avg.toFixed(1)}</div>
+          <div style="font-size:11px;color:var(--gray-400)">${item.count}명 선택</div>
+        </div>
       </div>`;
     });
     html += `</div></div>`;
 
-    // Two-column insight cards
-    html += `<div class="result-section"><div class="insight-grid">`;
-
-    // 합의도 높은/낮은 항목
-    const highConsensus = consensus.filter(c => parseInt(c.agreement) >= 70);
-    const lowConsensus = consensus.filter(c => parseInt(c.agreement) < 50);
-    html += `<div class="insight-card">
-      <div style="font-size:13px;font-weight:700;color:var(--gray-400);margin-bottom:12px">🤝 의견이 일치한 항목</div>
-      ${highConsensus.length > 0 ? highConsensus.map(c => {
-        const catLabel = c.topCat === 'must' ? '필수' : c.topCat === 'nice' ? '참고' : '불필요';
-        const catColor = c.topCat === 'must' ? 'var(--primary)' : c.topCat === 'nice' ? 'var(--yellow)' : 'var(--red)';
-        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div style="flex:1;font-size:14px;font-weight:600">${c.name}</div>
-          <div style="width:80px;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
-            <div style="width:${c.agreement}%;height:100%;background:${catColor};border-radius:3px"></div>
-          </div>
-          <div style="font-size:13px;font-weight:700;color:${catColor};min-width:32px;text-align:right">${c.agreement}%</div>
-          <div style="font-size:11px;color:var(--gray-400)">${catLabel}</div>
-        </div>`;
-      }).join('') : '<div style="font-size:13px;color:var(--gray-400)">아직 70% 이상 합의된 항목이 없습니다</div>'}
-    </div>`;
-
-    // 제거 후보
-    html += `<div class="insight-card">
-      <div style="font-size:13px;font-weight:700;color:var(--gray-400);margin-bottom:12px">🗑️ 제거 검토 항목</div>
-      ${topNo.length > 0 ? topNo.map(c => {
-        const noPct = Math.round(catCounts[c].no / n * 100);
-        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div style="flex:1;font-size:14px;font-weight:600">${c}</div>
-          <div style="width:80px;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
-            <div style="width:${noPct}%;height:100%;background:var(--red);border-radius:3px"></div>
-          </div>
-          <div style="font-size:13px;font-weight:700;color:var(--red);min-width:32px;text-align:right">${noPct}%</div>
-          <div style="font-size:11px;color:var(--gray-400)">불필요</div>
-        </div>`;
-      }).join('') : '<div style="font-size:13px;color:var(--gray-400)">과반수가 불필요로 선택한 항목이 없습니다</div>'}
-    </div>`;
-    html += `</div></div>`;
-
-    // Distribution
-    html += `<div class="result-section"><div class="result-section-title">📊 카테고리별 분포</div><div class="result-card">`;
+    // ===== 3. Selection Distribution =====
+    const sortedByMust = cards.filter(c => catCounts[c]).sort((a,b) => catCounts[b].must - catCounts[a].must);
+    html += `<div class="result-section"><div class="result-section-title">선택 분포</div>
+      <div style="display:flex;gap:12px;margin:-8px 0 16px;font-size:12px;color:var(--gray-400)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--red)"></span> 필수 (1-3순위)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--yellow)"></span> 선택 (4-6순위)</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--gray-200)"></span> 미선택</span>
+      </div>
+      <div class="result-card" style="padding:0;overflow:hidden">`;
     sortedByMust.forEach((c, i) => {
       const must = catCounts[c].must, nice = catCounts[c].nice, no = catCounts[c].no;
       const mustPct = must/n*100, nicePct = nice/n*100, noPct = no/n*100;
-      html += `<div class="result-item">
-        <div class="result-rank ${i<3?'rank-'+(i+1):'rank-default'}">${i+1}</div>
-        <div class="result-name">${c}</div>
-        <div class="result-bar-wrap">
-          <div style="display:flex;gap:2px;flex:1;height:10px;border-radius:5px;overflow:hidden;background:var(--gray-100)">
-            <div style="width:${mustPct}%;background:var(--primary);transition:width 0.6s"></div>
-            <div style="width:${nicePct}%;background:var(--yellow);transition:width 0.6s"></div>
-            <div style="width:${noPct}%;background:var(--red);transition:width 0.6s"></div>
-          </div>
-          <div style="display:flex;gap:8px;min-width:120px;font-size:12px;font-weight:600">
-            <span style="color:var(--primary)">${must}명</span>
-            <span style="color:var(--yellow)">${nice}명</span>
-            <span style="color:var(--red)">${no}명</span>
-          </div>
-        </div></div>`;
+      html += `<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;${i < sortedByMust.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''}">
+        <div style="min-width:100px;font-size:14px;font-weight:600;color:var(--gray-800)">${c}</div>
+        <div style="flex:1;display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;background:var(--gray-100)">
+          <div style="width:${mustPct}%;background:var(--red);transition:width 0.6s"></div>
+          <div style="width:${nicePct}%;background:var(--yellow);transition:width 0.6s"></div>
+        </div>
+        <div style="min-width:80px;text-align:right;font-size:13px;font-weight:700;color:var(--red)">${must}명</div>
+      </div>`;
     });
-    html += `</div>
-      <div style="display:flex;gap:16px;margin-top:12px;justify-content:center;font-size:12px;color:var(--gray-400)">
-        <span>🔥 필수 (1-3순위)</span><span>⭐ 선택 (4-6순위)</span><span>— 미선택</span>
-      </div></div>`;
+    html += `</div></div>`;
 
-    // Priority
-    if (sortedByPriority.length > 0) {
-      html += `<div class="result-section"><div class="result-section-title">⭐ "꼭 있어야 해요" 우선순위 평균</div><div class="result-card">
-        <div style="font-size:12px;color:var(--gray-400);margin-bottom:12px">숫자가 낮을수록 더 중요하게 평가된 항목입니다 (1순위에 가까움)</div>`;
-      sortedByPriority.forEach((item, i) => {
-        html += `<div class="priority-result-item">
-          <div class="result-rank ${i<3?'rank-'+(i+1):'rank-default'}">${i+1}</div>
-          <div class="priority-avg">평균 ${item.avg.toFixed(1)}순위</div>
-          <div class="priority-result-name">${item.name}</div>
-          <div class="priority-votes">${item.count}명 응답</div></div>`;
-      });
-      html += `</div></div>`;
-    }
+    body.innerHTML = html;
 
-    // Per participant list
-    html += `<div class="result-section"><div class="result-section-title">👤 참여자별 응답 (${n}명)</div><div class="result-card"><div class="participant-list">`;
+    // Render participants tab separately
+    renderParticipants();
+  }
+
+  function renderParticipants() {
+    const container = document.getElementById('resultsParticipants');
+    const n = allResults.length;
+    if (n === 0) { container.innerHTML = '<div style="text-align:center;padding:60px;color:var(--gray-400)">아직 참여자가 없습니다</div>'; return; }
+
+    let html = `<div class="result-section"><div class="result-section-title">참여자 목록 <span style="color:var(--gray-400);font-weight:600">${n}명</span></div>
+      <div class="result-card" style="padding:0;overflow:hidden">`;
     allResults.forEach((r, i) => {
       const date = new Date(r.timestamp);
       const timeStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
       const ranked = (r.priority || [...r.sort.must, ...r.sort.nice]).length;
-      html += `<div class="participant-row">
+      const top1 = (r.priority && r.priority[0]) || (r.sort.must && r.sort.must[0]) || '';
+      html += `<div style="display:flex;align-items:center;gap:12px;padding:14px 20px;${i < n-1 ? 'border-bottom:1px solid var(--gray-100)' : ''};cursor:pointer;transition:background 0.1s" onclick="showDetailView(${i},'results')" onmouseenter="this.style.background='var(--gray-50)'" onmouseleave="this.style.background=''">
         <div class="participant-avatar">${escapeHtml(r.name.slice(0,1))}</div>
-        <div class="participant-info">
-          <div class="participant-name">${escapeHtml(r.name)}</div>
-          <div class="participant-meta">${timeStr} · ${ranked}개 선택</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:var(--gray-800)">${escapeHtml(r.name)}</div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:2px">${timeStr} · ${ranked}개 선택 · 1순위: ${escapeHtml(top1)}</div>
         </div>
-        <div class="participant-actions">
-          <button class="btn-sm btn-sm-primary" onclick="showDetailView(${i},'results')">상세</button>
-          <button class="btn-sm btn-sm-danger" onclick="deleteResult(${i})">삭제</button>
-        </div>
+        <button class="btn-sm btn-sm-danger" onclick="event.stopPropagation();deleteResult(${i})" style="flex-shrink:0">삭제</button>
+        <span style="color:var(--gray-300);font-size:16px;flex-shrink:0">›</span>
       </div>`;
     });
-    html += `</div></div></div>`;
-
-    body.innerHTML = html;
+    html += `</div></div>`;
+    container.innerHTML = html;
   }
 
   // ===== EXPORT =====
