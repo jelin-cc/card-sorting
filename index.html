@@ -323,7 +323,7 @@
 
   .sort-header {
     background: white;
-    padding: 16px 32px;
+    padding: 14px 32px;
     border-bottom: 1px solid var(--gray-100);
     position: sticky; top: 0; z-index: 100;
   }
@@ -385,7 +385,7 @@
   .sort-hero {
     max-width: 1060px;
     margin: 0 auto;
-    padding: 32px 32px 0;
+    padding: 36px 32px 8px;
     background: white;
   }
 
@@ -395,7 +395,7 @@
     color: var(--gray-900);
     line-height: 1.4;
     letter-spacing: -0.5px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 
   .sort-hero-desc {
@@ -1463,6 +1463,48 @@
     color: var(--gray-500);
   }
 
+  /* Onboarding tooltip */
+  .pool-tooltip {
+    position: absolute;
+    top: -44px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray-900);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 10px;
+    white-space: nowrap;
+    z-index: 10;
+    animation: tooltipBounce 2s ease-in-out infinite;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+
+  .pool-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px; height: 12px;
+    background: var(--gray-900);
+    border-radius: 2px;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  @keyframes tooltipBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-6px); }
+  }
+
+  .pool-tooltip.hide {
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
   .ranking-card {
     background: var(--gray-50);
     border-radius: 16px;
@@ -1699,7 +1741,8 @@
   <div class="sort-layout">
     <!-- LEFT: Card Pool -->
     <div class="sort-left">
-      <div class="ranking-card">
+      <div class="ranking-card" style="position:relative">
+        <div class="pool-tooltip" id="poolTooltip">카드를 끌어서 오른쪽에 놓아주세요 →</div>
         <div class="ranking-card-header">
           <span class="ranking-section-label pool-label">정보 카드</span>
           <span class="ranking-card-hint" id="poolCount"></span>
@@ -1753,7 +1796,7 @@
 </div>
 
 <!-- ===== DETAIL VIEW (read-only sorting screen) ===== -->
-<div id="detail-view" class="screen" style="flex-direction:column;background:var(--gray-50)">
+<div id="detail-view" class="screen" style="flex-direction:column;background:white">
   <div class="sort-header">
     <div class="sort-header-top">
       <div class="sort-header-left">
@@ -1761,12 +1804,12 @@
         <span class="sort-step" id="detailStep">분류 결과</span>
       </div>
     </div>
-    <h2 class="sort-title" id="detailTitle"></h2>
-    <p class="sort-desc" id="detailTime"></p>
   </div>
-  <div style="flex:1;padding:20px 32px;max-width:600px;margin:0 auto;width:100%">
-    <div id="detailRankedList"></div>
+  <div class="sort-hero">
+    <h2 class="sort-hero-title" id="detailTitle"></h2>
+    <p class="sort-hero-desc" id="detailTime"></p>
   </div>
+  <div class="sort-layout" id="detailLayout"></div>
 </div>
 
 <!-- Detail Modal -->
@@ -2061,21 +2104,43 @@
     document.getElementById('detailStep').textContent = '분류 결과';
     document.getElementById('detailTitle').textContent = `${r.name}님의 분류 결과`;
     const date = new Date(r.timestamp);
-    document.getElementById('detailTime').textContent =
+    document.getElementById('detailTime').innerHTML =
       `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')} 참여`;
 
-    const container = document.getElementById('detailRankedList');
+    const container = document.getElementById('detailLayout');
     const priority = r.priority || [...r.sort.must, ...r.sort.nice];
-    let html = '<div class="ranking-panel" style="background:white;border-color:var(--gray-200)">';
-    html += '<div class="ranking-slots">';
-    priority.forEach((c, i) => {
-      const isReq = i < 3;
-      if (i === 3) html += '<div class="ranking-divider"></div>';
-      html += `<div class="ranking-slot">
-        <div class="slot-meta">
-          <span class="slot-label ${isReq ? 'required' : 'optional'}">${isReq ? '🔥 필수' : '(선택)'}</span>
-          <span class="slot-number">${i + 1}</span>
-        </div>
+    const unranked = r.sort.no || [];
+    const must = priority.slice(0, 3);
+    const nice = priority.slice(3);
+
+    // LEFT: Unranked cards (read-only, grayed)
+    let left = '<div class="sort-left"><div class="ranking-card">';
+    left += '<div class="ranking-card-header"><span class="ranking-section-label pool-label">미선택 카드</span>';
+    left += `<span class="ranking-card-hint">${unranked.length}개</span></div>`;
+    if (unranked.length > 0) {
+      left += '<div class="unsorted-pool-cards">';
+      unranked.forEach(c => {
+        left += `<div class="pool-card" style="cursor:default;opacity:0.5"><div class="pool-card-name">${escapeHtml(c)}</div>`;
+        if (CARD_EXAMPLES[c]) left += `<div class="pool-card-example">${escapeHtml(CARD_EXAMPLES[c])}</div>`;
+        left += '</div>';
+      });
+      left += '</div>';
+    } else {
+      left += '<div style="text-align:center;padding:20px;color:var(--gray-300);font-size:13px">모든 카드를 선택했어요</div>';
+    }
+    left += '</div></div>';
+
+    // RIGHT: Ranked slots (filled, read-only)
+    let right = '<div class="sort-right">';
+
+    // Required section
+    right += '<div class="ranking-card required">';
+    right += '<div class="ranking-card-header"><span class="ranking-section-label required">필수 3개</span>';
+    right += '<span class="ranking-card-hint" style="color:var(--primary)">✓ 완료</span></div>';
+    right += '<div class="ranking-slots">';
+    must.forEach((c, i) => {
+      right += `<div class="ranking-slot required">
+        <div class="slot-number required">${i + 1}</div>
         <div class="slot-drop-zone filled" style="cursor:default">
           <div class="slot-chip" style="cursor:default">
             <span class="slot-chip-name">${escapeHtml(c)}</span>
@@ -2084,21 +2149,31 @@
         </div>
       </div>`;
     });
-    html += '</div>';
+    right += '</div></div>';
 
-    const unranked = r.sort.no || [];
-    if (unranked.length > 0) {
-      html += '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200)">';
-      html += '<div style="font-size:13px;font-weight:700;color:var(--gray-400);margin-bottom:8px">미선택 항목</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
-      unranked.forEach(c => {
-        html += `<span style="padding:8px 14px;background:var(--gray-100);border-radius:10px;font-size:13px;font-weight:600;color:var(--gray-500)">${escapeHtml(c)}</span>`;
+    // Optional section
+    if (nice.length > 0) {
+      right += '<div class="ranking-card optional">';
+      right += '<div class="ranking-card-header"><span class="ranking-section-label optional">선택</span>';
+      right += '<span class="ranking-card-hint" style="color:var(--primary)">✓ 완료</span></div>';
+      right += '<div class="ranking-slots">';
+      nice.forEach((c, i) => {
+        right += `<div class="ranking-slot optional">
+          <div class="slot-number optional">${i + 4}</div>
+          <div class="slot-drop-zone filled" style="cursor:default">
+            <div class="slot-chip" style="cursor:default">
+              <span class="slot-chip-name">${escapeHtml(c)}</span>
+              ${CARD_EXAMPLES[c] ? '<span class="slot-chip-example">' + escapeHtml(CARD_EXAMPLES[c]) + '</span>' : ''}
+            </div>
+          </div>
+        </div>`;
       });
-      html += '</div></div>';
+      right += '</div></div>';
     }
 
-    html += '</div>';
-    container.innerHTML = html;
+    right += '</div>';
+
+    container.innerHTML = left + right;
     showScreen('detail-view');
   }
 
@@ -2178,6 +2253,9 @@
     renderRankingSlots();
     setupPoolDropTarget();
     updateProgress();
+    // Show tooltip, auto-hide after 5s
+    const tip = document.getElementById('poolTooltip');
+    if (tip) { tip.classList.remove('hide'); setTimeout(() => tip.classList.add('hide'), 5000); }
   }
 
   function renderUnsortedPool() {
@@ -2335,7 +2413,13 @@
     }
   }
 
+  function hideTooltip() {
+    const tip = document.getElementById('poolTooltip');
+    if (tip) tip.classList.add('hide');
+  }
+
   function addToSlot(name, slotIdx) {
+    hideTooltip();
     const currentSlotIdx = rankedSlots.indexOf(name);
     const existingCard = rankedSlots[slotIdx];
 
