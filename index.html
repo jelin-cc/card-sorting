@@ -382,30 +382,53 @@
     line-height: 1.5;
   }
 
+  .sort-hero {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 32px 32px 0;
+    background: white;
+  }
+
+  .sort-hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--gray-900);
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+
+  .sort-hero-desc {
+    font-size: 15px;
+    color: var(--gray-400);
+    line-height: 1.7;
+    margin-bottom: 0;
+  }
+
+  .sort-hero-desc b {
+    color: var(--red);
+    font-weight: 700;
+  }
+
   .sort-layout {
     flex: 1;
     display: flex;
-    gap: 0;
+    gap: 20px;
     width: 100%;
     max-width: 1060px;
     margin: 0 auto;
+    padding: 20px 32px 40px;
+    background: white;
   }
 
   .sort-left {
-    flex: 1;
-    padding: 28px 32px;
-    background: white;
-    border-right: 1px solid var(--gray-100);
-    min-height: calc(100vh - 110px);
-    display: flex;
-    flex-direction: column;
+    width: 420px;
+    flex-shrink: 0;
   }
 
   .sort-right {
     flex: 1;
-    padding: 28px 40px;
     min-width: 0;
-    background: #F5F6F8;
   }
 
   .ref-panel-title {
@@ -894,15 +917,11 @@
   /* Responsive */
   @media (max-width: 768px) {
     .categories { grid-template-columns: 1fr; }
-    .sort-layout { flex-direction: column; }
-    .sort-left {
-      min-height: auto;
-      border-right: none;
-      border-bottom: 1px solid var(--gray-100);
-      padding: 16px;
-    }
-    .sort-right { padding: 16px; }
-    .sort-header { padding: 16px; }
+    .sort-hero { padding: 24px 16px 0; }
+    .sort-hero-title { font-size: 20px; }
+    .sort-layout { flex-direction: column; padding: 16px; gap: 12px; }
+    .sort-left { width: 100%; }
+    .sort-header { padding: 12px 16px; }
     .result-item { flex-wrap: wrap; }
     .result-bar-wrap { flex-basis: 100%; }
     .intro-title { font-size: 26px; }
@@ -1439,44 +1458,25 @@
     margin: 20px 0 16px;
   }
 
-  .ranking-question {
-    margin-bottom: 24px;
-  }
-
-  .ranking-question h3 {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--gray-900);
-    margin-bottom: 12px;
-    line-height: 1.4;
-    letter-spacing: -0.5px;
-  }
-
-  .ranking-question p {
-    font-size: 14px;
+  .ranking-section-label.pool-label {
+    background: var(--gray-100);
     color: var(--gray-500);
-    line-height: 1.7;
-  }
-
-  .ranking-question p b {
-    color: var(--red);
-    font-weight: 700;
   }
 
   .ranking-card {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    margin-bottom: 16px;
+    background: var(--gray-50);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
   }
 
   .ranking-card.required {
-    border: 1.5px solid rgba(255,77,77,0.15);
-    background: linear-gradient(180deg, rgba(255,77,77,0.02) 0%, white 40%);
+    background: linear-gradient(180deg, #FFF0F0 0%, #FFF8F8 30%, white 100%);
+    border: 1.5px solid rgba(255,77,77,0.12);
   }
 
   .ranking-card.optional {
+    background: var(--gray-50);
     border: 1.5px solid var(--gray-100);
   }
 
@@ -1691,14 +1691,19 @@
     </div>
   </div>
 
+  <div class="sort-hero">
+    <h2 class="sort-hero-title" id="rankingQuestion">어떤 정보가 있으면<br>공고를 눌러볼 것 같으신가요?</h2>
+    <p class="sort-hero-desc" id="rankingDesc">중요한 카드를 골라 오른쪽 순위칸에 넣어주세요. <b>필수 3개</b>는 꼭 채워주시고, 나머지 3개는 선택이에요.</p>
+  </div>
+
   <div class="sort-layout">
-    <!-- LEFT: Question + Card Pool -->
+    <!-- LEFT: Card Pool -->
     <div class="sort-left">
-      <div class="ranking-question">
-        <h3 id="rankingQuestion">어떤 정보가 있으면<br>공고를 눌러볼 것 같으신가요?</h3>
-        <p id="rankingDesc">중요한 카드를 골라 오른쪽 순위칸에 넣어주세요.<br><b>필수 3개</b>는 꼭 채워주시고, 나머지 3개는 선택이에요.</p>
-      </div>
-      <div class="unsorted-pool">
+      <div class="ranking-card">
+        <div class="ranking-card-header">
+          <span class="ranking-section-label pool-label">정보 카드</span>
+          <span class="ranking-card-hint" id="poolCount"></span>
+        </div>
         <div class="unsorted-pool-cards" id="unsortedCards"></div>
       </div>
     </div>
@@ -2181,6 +2186,8 @@
     const container = document.getElementById('unsortedCards');
     container.innerHTML = '';
     unsortedList.forEach(c => container.appendChild(createPoolCard(c)));
+    const countEl = document.getElementById('poolCount');
+    if (countEl) countEl.textContent = `${unsortedList.length}개 남음`;
   }
 
   function setupPoolDropTarget() {
