@@ -323,14 +323,13 @@
 
   .sort-header {
     background: white;
-    padding: 20px 32px 16px;
+    padding: 16px 32px;
     border-bottom: 1px solid var(--gray-100);
     position: sticky; top: 0; z-index: 100;
   }
 
   .sort-header-top {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 12px;
   }
 
   .sort-header-left {
@@ -1451,18 +1450,18 @@
   }
 
   .ranking-question h3 {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 800;
     color: var(--gray-900);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     line-height: 1.4;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.5px;
   }
 
   .ranking-question p {
     font-size: 14px;
-    color: var(--gray-400);
-    line-height: 1.6;
+    color: var(--gray-500);
+    line-height: 1.7;
   }
 
   .ranking-section-label {
@@ -1660,12 +1659,10 @@
         <div class="header-progress-bar">
           <div class="header-progress-fill" id="sortProgress" style="width:0%"></div>
         </div>
-        <span class="header-progress-label" id="progressText"><b style="color:var(--primary)">0</b> / 12개</span>
+        <span class="header-progress-label" id="progressText"><b style="color:var(--primary)">0</b> / 6개</span>
         <button class="btn-complete-header" id="btnNext" disabled onclick="finishSorting()">완료하기 ✓</button>
       </div>
     </div>
-    <h2 class="sort-title" id="sortTitle">어떤 정보가 가장 중요한가요?</h2>
-    <p class="sort-desc" id="sortDesc">각 카드를 중요도에 따라 우측 3가지 영역에 넣어주세요. 넣은 순서가 곧 우선순위가 돼요.</p>
   </div>
 
   <div class="sort-layout">
@@ -1681,8 +1678,8 @@
     <div class="sort-right">
       <div class="ranking-panel">
         <div class="ranking-question">
-          <h3 id="rankingQuestion">이 정보가 있으면 공고를 눌러볼 것 같아요</h3>
-          <p id="rankingDesc">가장 중요한 정보부터 순서대로 배치해주세요</p>
+          <h3 id="rankingQuestion">이 정보가 있으면<br>공고를 눌러볼 것 같아요</h3>
+          <p id="rankingDesc">왼쪽 카드를 드래그해서 중요한 순서대로 배치해주세요.<br>필수 3개는 꼭 채워주시고, 나머지 3개는 선택이에요.</p>
         </div>
         <div class="ranking-section-label required">필수 3개</div>
         <div class="ranking-slots" id="rankingSlotsRequired"></div>
@@ -2127,8 +2124,6 @@
     rankedSlots = [null, null, null, null, null, null];
     // Apply mode to sorting screen
     const m = getMode();
-    document.getElementById('sortTitle').textContent = m.sortTitle;
-    document.getElementById('sortDesc').textContent = m.sortDesc;
     document.getElementById('rankingQuestion').innerHTML = m.rankQuestion;
     document.getElementById('rankingDesc').innerHTML = m.rankDesc;
     showScreen('sorting');
