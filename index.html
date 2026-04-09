@@ -1362,6 +1362,227 @@
     font-weight: 600;
     color: var(--gray-500);
   }
+
+  /* ===== RANKING LAYOUT ===== */
+  .unsorted-pool {
+    margin-top: 24px;
+  }
+
+  .unsorted-pool-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-400);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .unsorted-pool-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    min-height: 60px;
+  }
+
+  .unsorted-pool-cards:empty::after {
+    content: '모든 카드를 배치했어요!';
+    color: var(--gray-300);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    padding: 16px;
+    grid-column: 1 / -1;
+  }
+
+  .pool-card {
+    padding: 14px 10px;
+    background: white;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 12px;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .pool-card:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .pool-card:active, .pool-card.dragging {
+    cursor: grabbing;
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+
+  .pool-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+
+  .pool-card-example {
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 2px;
+  }
+
+  .ranking-panel {
+    border: 2px solid rgba(0, 196, 113, 0.2);
+    border-radius: var(--radius);
+    background: var(--primary-light);
+    padding: 24px;
+  }
+
+  .ranking-question {
+    margin-bottom: 24px;
+  }
+
+  .ranking-question h3 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .ranking-question p {
+    font-size: 13px;
+    color: var(--gray-500);
+    line-height: 1.6;
+  }
+
+  .ranking-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ranking-slot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .slot-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 80px;
+    flex-shrink: 0;
+    justify-content: flex-end;
+  }
+
+  .slot-label {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .slot-label.required { color: var(--gray-700); }
+  .slot-label.optional { color: var(--gray-400); }
+
+  .slot-number {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--gray-700);
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .slot-drop-zone {
+    flex: 1;
+    min-height: 52px;
+    border: 2px dashed var(--gray-300);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    transition: all 0.2s;
+    background: white;
+  }
+
+  .slot-drop-zone.empty::after {
+    content: '+ 여기에 드래그';
+    color: var(--gray-300);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .slot-drop-zone.drag-over {
+    border-color: var(--primary);
+    background: rgba(0, 196, 113, 0.08);
+    box-shadow: 0 0 0 3px rgba(0, 196, 113, 0.1);
+  }
+
+  .slot-drop-zone.filled {
+    border-style: solid;
+    border-color: var(--gray-200);
+    background: white;
+    padding: 6px 12px;
+  }
+
+  .slot-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    cursor: grab;
+  }
+
+  .slot-chip-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+
+  .slot-chip-example {
+    font-size: 11px;
+    color: var(--gray-400);
+    flex: 1;
+  }
+
+  .slot-chip-remove {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .slot-chip-remove:hover { color: var(--red); background: var(--red-light); }
+
+  .ranking-divider {
+    height: 1px;
+    background: var(--gray-300);
+    margin: 4px 0;
+  }
+
+  .unsorted-pool-cards.drag-over {
+    background: var(--gray-50);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    border-radius: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .sort-left .ref-panel { display: none; }
+    .unsorted-pool { margin-top: 0; }
+    .unsorted-pool-cards { grid-template-columns: 1fr 1fr; }
+    .ranking-panel { padding: 16px; }
+    .slot-meta { min-width: 64px; }
+  }
 </style>
 </head>
 <body>
@@ -1518,49 +1739,20 @@
           </div>
         </div>
       </div>
+      <div class="unsorted-pool">
+        <div class="unsorted-pool-label">📦 분류할 카드</div>
+        <div class="unsorted-pool-cards" id="unsortedCards"></div>
+      </div>
     </div>
 
-    <!-- RIGHT: Sorting Area -->
+    <!-- RIGHT: Ranking Area -->
     <div class="sort-right">
-      <div class="unsorted-area">
-        <div class="unsorted-label">📦 아래 영역으로 카드를 드래그해주세요</div>
-        <div class="unsorted-cards" id="unsortedCards"
-             ondrop="dropToUnsorted(event)" ondragover="dragOverUnsorted(event)" ondragleave="dragLeaveUnsorted(event)"></div>
-      </div>
-
-      <div class="categories">
-        <div class="category-zone cat-must" data-category="must"
-             ondrop="dropCard(event,'must')" ondragover="dragOver(event)" ondragleave="dragLeave(event)">
-          <div class="cat-header">
-            <span class="cat-icon">✅</span>
-            <span class="cat-title">꼭 있어야 해요</span>
-          </div>
-          <div class="cat-sub">"이 정보 없으면 공고를 안 볼 것 같아요"</div>
-          <div class="cat-cards" id="mustCards" data-category="must"
-             ondrop="dropCard(event,'must')" ondragover="dragOver(event)" ondragleave="dragLeave(event)"></div>
+      <div class="ranking-panel">
+        <div class="ranking-question">
+          <h3 id="rankingQuestion">어떤 정보가 있으면 공고를 눌러볼 것 같으신가요?</h3>
+          <p id="rankingDesc">우선 순위에 따라 최대 6개를 나열해 보세요.<br>필수 3개 / 나머지는 선택입니다.</p>
         </div>
-
-        <div class="category-zone cat-nice" data-category="nice"
-             ondrop="dropCard(event,'nice')" ondragover="dragOver(event)" ondragleave="dragLeave(event)">
-          <div class="cat-header">
-            <span class="cat-icon">🟡</span>
-            <span class="cat-title">있으면 좋아요</span>
-          </div>
-          <div class="cat-sub">"있으면 참고하지만, 없어도 괜찮아요"</div>
-          <div class="cat-cards" id="niceCards" data-category="nice"
-             ondrop="dropCard(event,'nice')" ondragover="dragOver(event)" ondragleave="dragLeave(event)"></div>
-        </div>
-
-        <div class="category-zone cat-no" data-category="no"
-             ondrop="dropCard(event,'no')" ondragover="dragOver(event)" ondragleave="dragLeave(event)">
-          <div class="cat-header">
-            <span class="cat-icon">❌</span>
-            <span class="cat-title">굳이 안 봐요</span>
-          </div>
-          <div class="cat-sub">"공고 목록에서는 딱히 안 봐요"</div>
-          <div class="cat-cards" id="noCards" data-category="no"
-             ondrop="dropCard(event,'no')" ondragover="dragOver(event)" ondragleave="dragLeave(event)"></div>
-        </div>
+        <div class="ranking-slots" id="rankingSlots"></div>
       </div>
     </div>
   </div>
@@ -1602,21 +1794,8 @@
     <h2 class="sort-title" id="detailTitle"></h2>
     <p class="sort-desc" id="detailTime"></p>
   </div>
-  <div style="flex:1;padding:20px 32px;max-width:960px;margin:0 auto;width:100%">
-    <div class="categories">
-      <div class="category-zone cat-must">
-        <div class="cat-header"><span class="cat-icon">✅</span><span class="cat-title">꼭 있어야 해요</span></div>
-        <div class="cat-cards" id="detailMust"></div>
-      </div>
-      <div class="category-zone cat-nice">
-        <div class="cat-header"><span class="cat-icon">🟡</span><span class="cat-title">있으면 좋아요</span></div>
-        <div class="cat-cards" id="detailNice"></div>
-      </div>
-      <div class="category-zone cat-no">
-        <div class="cat-header"><span class="cat-icon">❌</span><span class="cat-title">굳이 안 봐요</span></div>
-        <div class="cat-cards" id="detailNo"></div>
-      </div>
-    </div>
+  <div style="flex:1;padding:20px 32px;max-width:600px;margin:0 auto;width:100%">
+    <div id="detailRankedList"></div>
   </div>
 </div>
 
@@ -1645,6 +1824,31 @@
 
 <script>
   // ===== DATA =====
+  const CARD_EXAMPLES = {
+    '직무명': 'ex. 마케터, CRM',
+    '회사명': 'ex. 잡플래닛, 네이버',
+    '지역': 'ex. 서울, 경기, 대전',
+    '경력 조건': 'ex. 경력 2년 이상',
+    '마감일': 'ex. D-7',
+    '핵심 장점 태그': 'ex. 연봉 상위 10%',
+    '리뷰 기반 언급 수': 'ex. 승진 언급 12건',
+    '현직자 비중': 'ex. 현직자 60%',
+    '학력 조건': 'ex. 고졸 이상',
+    '기업 이미지/로고': '',
+    '취업축하금': 'ex. 합격시 100만원',
+    '북마크': '',
+    '총 만족도': 'ex. 4.5/5.0',
+    '개별 만족도': 'ex. 워라밸, 급여 등',
+    '리뷰 작성 일자': 'ex. 2026.03 작성',
+    '현/전직장 라벨': 'ex. 현직원/전직원',
+    '직무': 'ex. 백엔드, 프론트엔드',
+    '리뷰 제목': 'ex. 워라밸 최고',
+    '장점': '', '단점': '',
+    '1년 후 기업 성장세': '',
+    '기업 추천 여부': '',
+    '도움이 돼요 수': 'ex. 198명',
+  };
+
   const MODES = {
     job: {
       cards: ['직무명','회사명','지역','경력 조건','마감일','핵심 장점 태그','리뷰 기반 언급 수','현직자 비중','학력 조건','기업 이미지/로고','취업축하금','북마크'],
@@ -1652,7 +1856,9 @@
       title: '공고 카드 정보',
       storageKey: 'cardSortResults',
       sortTitle: '어떤 정보가 가장 중요한가요?',
-      sortDesc: '각 카드를 중요도에 따라 우측 3가지 영역에 넣어주세요. 넣은 순서가 곧 우선순위가 돼요.',
+      sortDesc: '왼쪽 카드를 드래그해서 우선순위를 정해주세요.',
+      rankQuestion: '어떤 정보가 있으면 공고를 눌러볼 것 같으신가요?',
+      rankDesc: '우선 순위에 따라 최대 6개를 나열해 보세요.<br>필수 3개 / 나머지는 선택입니다.',
       refTitle: '💼 공고 카드 예시',
       refSub: '이런 카드에 들어갈 정보를 분류합니다',
       fabIcon: '📝', fabLabel: '리뷰 정보 나누기',
@@ -1664,7 +1870,9 @@
       title: '리뷰 정보',
       storageKey: 'reviewSortResults',
       sortTitle: '리뷰에서 어떤 정보가 가장 중요한가요?',
-      sortDesc: '각 카드를 중요도에 따라 우측 3가지 영역에 넣어주세요. 넣은 순서가 곧 우선순위가 돼요.',
+      sortDesc: '왼쪽 카드를 드래그해서 우선순위를 정해주세요.',
+      rankQuestion: '리뷰에서 어떤 정보가 가장 중요한가요?',
+      rankDesc: '우선 순위에 따라 최대 6개를 나열해 보세요.<br>필수 3개 / 나머지는 선택입니다.',
       refTitle: '📝 리뷰 카드 예시',
       refSub: '이런 리뷰에 들어갈 정보를 분류합니다',
       fabIcon: '💼', fabLabel: '공고 카드 나누기',
@@ -1749,6 +1957,7 @@
   let allResults = [];
   let currentName = '';
   let currentSort = { must: [], nice: [], no: [] };
+  let rankedSlots = [null, null, null, null, null, null];
   let draggedCard = null;
   let dragSource = null;
 
@@ -1849,26 +2058,25 @@
     document.getElementById('modalTime').textContent =
       `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')} 참여`;
 
-    const cats = [
-      { key: 'must', label: '✅ 꼭 있어야 해요', cls: 'must' },
-      { key: 'nice', label: '🟡 있으면 좋아요', cls: 'nice' },
-      { key: 'no', label: '❌ 굳이 안 봐요', cls: 'no' }
-    ];
-    let html = '';
-    cats.forEach(cat => {
-      const items = r.sort[cat.key];
-      if (items.length === 0) return;
-      html += `<div class="modal-cat">
-        <div class="modal-cat-title">${cat.label}</div>
-        <div class="modal-cat-chips">`;
-      items.forEach((c, i) => {
-        html += `<div class="modal-chip ${cat.cls}">
-          <span class="modal-chip-rank">${i + 1}</span>
-          ${escapeHtml(c)}
-        </div>`;
-      });
-      html += `</div></div>`;
+    const priority = r.priority || [...r.sort.must, ...r.sort.nice];
+    let html = '<div class="modal-cat"><div class="modal-cat-title">🔥 우선순위</div><div class="modal-cat-chips">';
+    priority.forEach((c, i) => {
+      const cls = i < 3 ? 'must' : 'nice';
+      html += `<div class="modal-chip ${cls}">
+        <span class="modal-chip-rank">${i + 1}</span>
+        ${escapeHtml(c)}
+      </div>`;
     });
+    html += '</div></div>';
+
+    const unranked = r.sort.no || [];
+    if (unranked.length > 0) {
+      html += '<div class="modal-cat"><div class="modal-cat-title" style="color:var(--gray-400)">미선택</div><div class="modal-cat-chips">';
+      unranked.forEach(c => {
+        html += `<div class="modal-chip" style="background:var(--gray-100);color:var(--gray-500)">${escapeHtml(c)}</div>`;
+      });
+      html += '</div></div>';
+    }
 
     document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalDeleteBtn').onclick = () => deleteResult(idx);
@@ -1886,7 +2094,6 @@
     const r = allResults[idx];
     if (!r) return;
     detailBackScreen = fromScreen || 'results';
-    const mode = r.mode || currentMode;
 
     document.getElementById('detailStep').textContent = '분류 결과';
     document.getElementById('detailTitle').textContent = `${r.name}님의 분류 결과`;
@@ -1894,29 +2101,41 @@
     document.getElementById('detailTime').textContent =
       `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')} 참여`;
 
-    // Render read-only cards
-    function renderReadonlyCards(containerId, items, catClass) {
-      const el = document.getElementById(containerId);
-      el.innerHTML = '';
-      items.forEach((c, i) => {
-        const chip = document.createElement('div');
-        chip.className = 'chip-readonly';
-        const badge = document.createElement('span');
-        const rankCls = catClass === 'nice' ? ' rank-nice' : catClass === 'no' ? ' rank-no' : '';
-        badge.className = 'chip-rank' + rankCls;
-        badge.textContent = i + 1;
-        chip.appendChild(badge);
-        const label = document.createElement('span');
-        label.textContent = c;
-        chip.appendChild(label);
-        el.appendChild(chip);
+    const container = document.getElementById('detailRankedList');
+    const priority = r.priority || [...r.sort.must, ...r.sort.nice];
+    let html = '<div class="ranking-panel" style="background:white;border-color:var(--gray-200)">';
+    html += '<div class="ranking-slots">';
+    priority.forEach((c, i) => {
+      const isReq = i < 3;
+      if (i === 3) html += '<div class="ranking-divider"></div>';
+      html += `<div class="ranking-slot">
+        <div class="slot-meta">
+          <span class="slot-label ${isReq ? 'required' : 'optional'}">${isReq ? '🔥 필수' : '(선택)'}</span>
+          <span class="slot-number">${i + 1}</span>
+        </div>
+        <div class="slot-drop-zone filled" style="cursor:default">
+          <div class="slot-chip" style="cursor:default">
+            <span class="slot-chip-name">${escapeHtml(c)}</span>
+            ${CARD_EXAMPLES[c] ? '<span class="slot-chip-example">' + escapeHtml(CARD_EXAMPLES[c]) + '</span>' : ''}
+          </div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+
+    const unranked = r.sort.no || [];
+    if (unranked.length > 0) {
+      html += '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200)">';
+      html += '<div style="font-size:13px;font-weight:700;color:var(--gray-400);margin-bottom:8px">미선택 항목</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+      unranked.forEach(c => {
+        html += `<span style="padding:8px 14px;background:var(--gray-100);border-radius:10px;font-size:13px;font-weight:600;color:var(--gray-500)">${escapeHtml(c)}</span>`;
       });
+      html += '</div></div>';
     }
 
-    renderReadonlyCards('detailMust', r.sort.must, 'must');
-    renderReadonlyCards('detailNice', r.sort.nice, 'nice');
-    renderReadonlyCards('detailNo', r.sort.no, 'no');
-
+    html += '</div>';
+    container.innerHTML = html;
     showScreen('detail-view');
   }
 
@@ -1976,11 +2195,13 @@
   function startSorting() {
     currentName = document.getElementById('nameField').value.trim();
     if (!currentName) return;
-    currentSort = { must: [], nice: [], no: [] };
+    rankedSlots = [null, null, null, null, null, null];
     // Apply mode to sorting screen
     const m = getMode();
     document.getElementById('sortTitle').textContent = m.sortTitle;
     document.getElementById('sortDesc').textContent = m.sortDesc;
+    document.getElementById('rankingQuestion').innerHTML = m.rankQuestion;
+    document.getElementById('rankingDesc').innerHTML = m.rankDesc;
     document.getElementById('refPanelTitle').textContent = m.refTitle;
     document.getElementById('refPanelSub').textContent = m.refSub;
     document.getElementById('refJobCards').style.display = currentMode === 'job' ? '' : 'none';
@@ -1990,74 +2211,205 @@
     renderSortingScreen();
   }
 
-  // ===== SORTING =====
-  function renderSortingScreen() {
-    const cards = getCards();
-    const unsorted = document.getElementById('unsortedCards');
-    unsorted.innerHTML = '';
-    const shuffled = [...cards].sort(() => Math.random() - 0.5);
-    shuffled.forEach(c => unsorted.appendChild(createChip(c, 'unsorted')));
+  // ===== SORTING (Ranking Slots) =====
+  let shuffledPool = null;
 
-    ['mustCards','niceCards','noCards'].forEach(id => {
-      document.getElementById(id).innerHTML = '';
-    });
+  function renderSortingScreen() {
+    rankedSlots = [null, null, null, null, null, null];
+    shuffledPool = [...getCards()].sort(() => Math.random() - 0.5);
+    renderUnsortedPool();
+    renderRankingSlots();
+    setupPoolDropTarget();
     updateProgress();
   }
 
-  function createChip(name, source, rank) {
-    const chip = document.createElement('div');
-    chip.className = 'card-chip';
-    chip.dataset.card = name;
-    chip.dataset.source = source;
-    chip.draggable = true;
+  function renderUnsortedPool() {
+    const sorted = new Set(rankedSlots.filter(Boolean));
+    const unsortedList = (shuffledPool || getCards()).filter(c => !sorted.has(c));
+    const container = document.getElementById('unsortedCards');
+    container.innerHTML = '';
+    unsortedList.forEach(c => container.appendChild(createPoolCard(c)));
+  }
 
-    // Rank badge for all categories
-    if (source !== 'unsorted' && rank !== undefined) {
-      const badge = document.createElement('span');
-      const rankClass = source === 'nice' ? ' rank-nice' : source === 'no' ? ' rank-no' : '';
-      badge.className = 'chip-rank' + rankClass;
-      badge.textContent = rank;
-      chip.appendChild(badge);
+  function setupPoolDropTarget() {
+    const pool = document.getElementById('unsortedCards');
+    pool.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      pool.classList.add('drag-over');
+    });
+    pool.addEventListener('dragleave', () => pool.classList.remove('drag-over'));
+    pool.addEventListener('drop', (e) => {
+      e.preventDefault();
+      pool.classList.remove('drag-over');
+      const name = e.dataTransfer.getData('text/plain') || draggedCard;
+      if (!name) return;
+      const slotIdx = rankedSlots.indexOf(name);
+      if (slotIdx >= 0) removeFromSlot(slotIdx);
+    });
+  }
+
+  function createPoolCard(name) {
+    const card = document.createElement('div');
+    card.className = 'pool-card';
+    card.dataset.card = name;
+    card.draggable = true;
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'pool-card-name';
+    nameEl.textContent = name;
+    card.appendChild(nameEl);
+
+    const example = CARD_EXAMPLES[name];
+    if (example) {
+      const exEl = document.createElement('div');
+      exEl.className = 'pool-card-example';
+      exEl.textContent = example;
+      card.appendChild(exEl);
     }
 
-    const label = document.createElement('span');
-    label.textContent = name;
-    label.style.flex = '1';
-    chip.appendChild(label);
-
-    // Remove button (only in categories)
-    if (source !== 'unsorted') {
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'chip-remove';
-      removeBtn.innerHTML = '×';
-      removeBtn.onclick = (e) => {
-        e.stopPropagation();
-        removeFromCategory(name);
-      };
-      chip.appendChild(removeBtn);
-    }
-
-    chip.addEventListener('dragstart', (e) => {
+    card.addEventListener('dragstart', (e) => {
       draggedCard = name;
-      dragSource = source;
-      chip.classList.add('dragging');
+      dragSource = 'pool';
+      card.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', name);
     });
-    chip.addEventListener('dragend', () => {
-      chip.classList.remove('dragging');
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
       draggedCard = null;
       dragSource = null;
-      // Remove all drag-over states
       document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
     });
 
     // Touch support
-    chip.addEventListener('touchstart', handleTouchStart, { passive: false });
-    chip.addEventListener('touchmove', handleTouchMove, { passive: false });
-    chip.addEventListener('touchend', handleTouchEnd, { passive: false });
+    card.addEventListener('touchstart', handleTouchStart, { passive: false });
+    card.addEventListener('touchmove', handleTouchMove, { passive: false });
+    card.addEventListener('touchend', handleTouchEnd, { passive: false });
 
-    return chip;
+    return card;
+  }
+
+  function renderRankingSlots() {
+    const container = document.getElementById('rankingSlots');
+    container.innerHTML = '';
+
+    for (let i = 0; i < 6; i++) {
+      if (i === 3) {
+        const divider = document.createElement('div');
+        divider.className = 'ranking-divider';
+        container.appendChild(divider);
+      }
+
+      const slot = document.createElement('div');
+      slot.className = 'ranking-slot';
+
+      const meta = document.createElement('div');
+      meta.className = 'slot-meta';
+
+      const label = document.createElement('span');
+      label.className = 'slot-label ' + (i < 3 ? 'required' : 'optional');
+      label.textContent = i < 3 ? '🔥 필수' : '(선택)';
+      meta.appendChild(label);
+
+      const number = document.createElement('span');
+      number.className = 'slot-number';
+      number.textContent = i + 1;
+      meta.appendChild(number);
+
+      slot.appendChild(meta);
+
+      const dropZone = document.createElement('div');
+      dropZone.className = 'slot-drop-zone' + (rankedSlots[i] ? ' filled' : ' empty');
+      dropZone.dataset.slot = i;
+
+      if (rankedSlots[i]) {
+        const name = rankedSlots[i];
+        const chip = document.createElement('div');
+        chip.className = 'slot-chip';
+        chip.draggable = true;
+        chip.dataset.card = name;
+        chip.dataset.source = 'slot-' + i;
+
+        const chipName = document.createElement('span');
+        chipName.className = 'slot-chip-name';
+        chipName.textContent = name;
+        chip.appendChild(chipName);
+
+        const example = CARD_EXAMPLES[name];
+        if (example) {
+          const chipEx = document.createElement('span');
+          chipEx.className = 'slot-chip-example';
+          chipEx.textContent = example;
+          chip.appendChild(chipEx);
+        }
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'slot-chip-remove';
+        removeBtn.innerHTML = '×';
+        removeBtn.onclick = (e) => { e.stopPropagation(); removeFromSlot(i); };
+        chip.appendChild(removeBtn);
+
+        chip.addEventListener('dragstart', (e) => {
+          draggedCard = name;
+          dragSource = 'slot-' + i;
+          chip.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', name);
+        });
+        chip.addEventListener('dragend', () => {
+          chip.classList.remove('dragging');
+          draggedCard = null;
+          dragSource = null;
+          document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        });
+
+        chip.addEventListener('touchstart', handleTouchStart, { passive: false });
+        chip.addEventListener('touchmove', handleTouchMove, { passive: false });
+        chip.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+        dropZone.appendChild(chip);
+      }
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const name = e.dataTransfer.getData('text/plain') || draggedCard;
+        if (name) addToSlot(name, i);
+      });
+
+      slot.appendChild(dropZone);
+      container.appendChild(slot);
+    }
+  }
+
+  function addToSlot(name, slotIdx) {
+    const currentSlotIdx = rankedSlots.indexOf(name);
+    const existingCard = rankedSlots[slotIdx];
+
+    if (currentSlotIdx >= 0) {
+      // Swapping between slots
+      rankedSlots[currentSlotIdx] = existingCard || null;
+    }
+    rankedSlots[slotIdx] = name;
+
+    renderUnsortedPool();
+    renderRankingSlots();
+    updateProgress();
+
+    const slotType = slotIdx < 3 ? '필수' : '선택';
+    showToast(`"${name}" → ${slotType} ${slotIdx + 1}순위`);
+  }
+
+  function removeFromSlot(slotIdx) {
+    rankedSlots[slotIdx] = null;
+    renderUnsortedPool();
+    renderRankingSlots();
+    updateProgress();
   }
 
   // Touch DnD
@@ -2066,29 +2418,29 @@
   let touchClone = null;
 
   function handleTouchStart(e) {
-    const chip = e.currentTarget;
-    touchDragging = chip.dataset.card;
-    touchSource = chip.dataset.source;
+    const el = e.currentTarget;
+    touchDragging = el.dataset.card;
+    touchSource = el.dataset.source || 'pool';
     const touch = e.touches[0];
 
     touchClone = document.createElement('div');
-    touchClone.className = 'card-chip';
-    touchClone.textContent = touchDragging;
+    touchClone.className = 'pool-card';
+    touchClone.innerHTML = `<div class="pool-card-name">${touchDragging}</div>`;
     touchClone.style.cssText = `position:fixed;z-index:10000;pointer-events:none;opacity:0.9;
-      transform:scale(1.05);box-shadow:0 8px 24px rgba(0,0,0,0.15);
-      left:${touch.clientX - 40}px;top:${touch.clientY - 20}px;`;
+      transform:scale(1.05);box-shadow:0 8px 24px rgba(0,0,0,0.15);width:120px;
+      left:${touch.clientX - 60}px;top:${touch.clientY - 25}px;`;
     document.body.appendChild(touchClone);
-    chip.style.opacity = '0.3';
+    el.style.opacity = '0.3';
   }
 
   function handleTouchMove(e) {
     e.preventDefault();
     if (!touchClone) return;
     const touch = e.touches[0];
-    touchClone.style.left = (touch.clientX - 40) + 'px';
-    touchClone.style.top = (touch.clientY - 20) + 'px';
+    touchClone.style.left = (touch.clientX - 60) + 'px';
+    touchClone.style.top = (touch.clientY - 25) + 'px';
 
-    document.querySelectorAll('.category-zone, .unsorted-cards').forEach(z => {
+    document.querySelectorAll('.slot-drop-zone, .unsorted-pool-cards').forEach(z => {
       const rect = z.getBoundingClientRect();
       if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
           touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
@@ -2103,165 +2455,46 @@
     if (!touchClone || !touchDragging) return;
     const touch = e.changedTouches[0];
     const name = touchDragging;
-    const src = touchSource;
 
-    document.querySelectorAll('.category-zone').forEach(z => {
+    // Check slot drop zones
+    let dropped = false;
+    document.querySelectorAll('.slot-drop-zone').forEach(z => {
       const rect = z.getBoundingClientRect();
-      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+      if (!dropped && touch.clientX >= rect.left && touch.clientX <= rect.right &&
           touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-        addToCategory(name, z.dataset.category, src);
+        addToSlot(name, parseInt(z.dataset.slot));
+        dropped = true;
       }
       z.classList.remove('drag-over');
     });
 
-    const unsorted = document.getElementById('unsortedCards');
-    const uRect = unsorted.getBoundingClientRect();
-    if (touch.clientX >= uRect.left && touch.clientX <= uRect.right &&
-        touch.clientY >= uRect.top && touch.clientY <= uRect.bottom) {
-      removeFromCategory(name);
+    // Check unsorted pool (return from slot)
+    if (!dropped) {
+      const pool = document.getElementById('unsortedCards');
+      const pRect = pool.getBoundingClientRect();
+      if (touch.clientX >= pRect.left && touch.clientX <= pRect.right &&
+          touch.clientY >= pRect.top && touch.clientY <= pRect.bottom) {
+        const slotIdx = rankedSlots.indexOf(name);
+        if (slotIdx >= 0) removeFromSlot(slotIdx);
+      }
+      pool.classList.remove('drag-over');
     }
-    unsorted.classList.remove('drag-over');
 
-    const srcChip = document.querySelector(`.card-chip[data-card="${name}"]`);
-    if (srcChip) srcChip.style.opacity = '1';
+    const srcEl = document.querySelector(`[data-card="${name}"]`);
+    if (srcEl) srcEl.style.opacity = '1';
     if (touchClone.parentNode) touchClone.remove();
     touchClone = null;
     touchDragging = null;
     touchSource = null;
   }
 
-  // Drag handlers
-  function dragOver(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    // Highlight the category-zone parent
-    const zone = e.currentTarget.closest ? e.currentTarget.closest('.category-zone') || e.currentTarget : e.currentTarget;
-    zone.classList.add('drag-over');
-  }
-  function dragLeave(e) {
-    e.stopPropagation();
-    const zone = e.currentTarget.closest ? e.currentTarget.closest('.category-zone') || e.currentTarget : e.currentTarget;
-    // Only remove if we're actually leaving the zone
-    const rect = zone.getBoundingClientRect();
-    if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-      zone.classList.remove('drag-over');
-    }
-  }
-
-  function dragOverUnsorted(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
-  }
-  function dragLeaveUnsorted(e) {
-    e.currentTarget.classList.remove('drag-over');
-  }
-
-  function dropToUnsorted(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-    const name = e.dataTransfer.getData('text/plain') || draggedCard;
-    if (name && dragSource !== 'unsorted') {
-      removeFromCategory(name);
-    }
-  }
-
-  function dropCard(e, category) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-    const name = e.dataTransfer.getData('text/plain') || draggedCard;
-    if (!name) return;
-
-    // If dropped within must-have, handle reorder
-    if (category === 'must' && dragSource === 'must') {
-      handleMustReorder(e, name);
-      return;
-    }
-
-    addToCategory(name, category, dragSource);
-  }
-
-  function addToCategory(name, category, fromSource) {
-    // Remove from all categories first
-    ['must','nice','no'].forEach(cat => {
-      currentSort[cat] = currentSort[cat].filter(c => c !== name);
-    });
-    currentSort[category].push(name);
-
-    renderAllCards();
-    updateProgress();
-
-    const catLabel = category === 'must' ? '꼭 있어야 해요' : category === 'nice' ? '있으면 좋아요' : '굳이 안 봐요';
-    const rank = currentSort[category].indexOf(name) + 1;
-    showToast(`"${name}" → ${catLabel} ${rank}순위`);
-  }
-
-  function removeFromCategory(name) {
-    ['must','nice','no'].forEach(cat => {
-      currentSort[cat] = currentSort[cat].filter(c => c !== name);
-    });
-    renderAllCards();
-    updateProgress();
-  }
-
-  function handleMustReorder(e, name) {
-    const container = document.getElementById('mustCards');
-    const chips = [...container.querySelectorAll('.card-chip')];
-    const mouseY = e.clientY;
-
-    // Find insertion index
-    let insertIdx = currentSort.must.length;
-    for (let i = 0; i < chips.length; i++) {
-      const rect = chips[i].getBoundingClientRect();
-      if (mouseY < rect.top + rect.height / 2) {
-        insertIdx = i;
-        break;
-      }
-    }
-
-    // Remove and reinsert
-    const oldIdx = currentSort.must.indexOf(name);
-    currentSort.must.splice(oldIdx, 1);
-    if (insertIdx > oldIdx) insertIdx--;
-    currentSort.must.splice(insertIdx, 0, name);
-
-    renderAllCards();
-    updateProgress();
-    showToast(`"${name}" → ${insertIdx + 1}순위로 변경`);
-  }
-
-  function renderAllCards() {
-    // Find which cards are sorted
-    const sorted = new Set([...currentSort.must, ...currentSort.nice, ...currentSort.no]);
-    const unsortedList = getCards().filter(c => !sorted.has(c));
-
-    // Render unsorted
-    const unsortedEl = document.getElementById('unsortedCards');
-    unsortedEl.innerHTML = '';
-    unsortedList.forEach(c => unsortedEl.appendChild(createChip(c, 'unsorted')));
-
-    // Render must (with rank numbers)
-    const mustEl = document.getElementById('mustCards');
-    mustEl.innerHTML = '';
-    currentSort.must.forEach((c, i) => mustEl.appendChild(createChip(c, 'must', i + 1)));
-
-    // Render nice (with rank numbers)
-    const niceEl = document.getElementById('niceCards');
-    niceEl.innerHTML = '';
-    currentSort.nice.forEach((c, i) => niceEl.appendChild(createChip(c, 'nice', i + 1)));
-
-    // Render no (with rank numbers)
-    const noEl = document.getElementById('noCards');
-    noEl.innerHTML = '';
-    currentSort.no.forEach((c, i) => noEl.appendChild(createChip(c, 'no', i + 1)));
-  }
-
   function updateProgress() {
-    const sorted = currentSort.must.length + currentSort.nice.length + currentSort.no.length;
-    const total = getCards().length;
-    const pct = (sorted / total) * 100;
+    const filledRequired = rankedSlots.slice(0, 3).filter(Boolean).length;
+    const filledTotal = rankedSlots.filter(Boolean).length;
+    const pct = (filledTotal / 6) * 100;
     document.getElementById('sortProgress').style.width = pct + '%';
-    document.getElementById('btnNext').disabled = sorted < total;
-    document.getElementById('progressText').innerHTML = `<b style="color:var(--primary)">${sorted}</b> / ${total}개`;
+    document.getElementById('btnNext').disabled = filledRequired < 3;
+    document.getElementById('progressText').innerHTML = `<b style="color:var(--primary)">${filledTotal}</b> / 6개`;
   }
 
   let _saving = false;
@@ -2269,11 +2502,16 @@
     if (_saving) return;
     _saving = true;
     document.getElementById('btnNext').disabled = true;
+
+    const must = rankedSlots.slice(0, 3).filter(Boolean);
+    const nice = rankedSlots.slice(3, 6).filter(Boolean);
+    const unranked = getCards().filter(c => !rankedSlots.includes(c));
+
     const result = {
       name: currentName,
       mode: currentMode,
-      sort: JSON.parse(JSON.stringify(currentSort)),
-      priority: [...currentSort.must],
+      sort: { must, nice, no: unranked },
+      priority: rankedSlots.filter(Boolean),
       timestamp: new Date().toISOString()
     };
     // Reload latest data first to avoid overwriting others
@@ -2426,7 +2664,7 @@
     });
     html += `</div>
       <div style="display:flex;gap:16px;margin-top:12px;justify-content:center;font-size:12px;color:var(--gray-400)">
-        <span>✅ 꼭 있어야 해요</span><span>🟡 있으면 좋아요</span><span>❌ 굳이 안 봐요</span>
+        <span>🔥 필수 (1-3순위)</span><span>⭐ 선택 (4-6순위)</span><span>— 미선택</span>
       </div></div>`;
 
     // Priority
@@ -2448,12 +2686,12 @@
     allResults.forEach((r, i) => {
       const date = new Date(r.timestamp);
       const timeStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
-      const mustN = r.sort.must.length, niceN = r.sort.nice.length, noN = r.sort.no.length;
+      const ranked = (r.priority || [...r.sort.must, ...r.sort.nice]).length;
       html += `<div class="participant-row">
         <div class="participant-avatar">${escapeHtml(r.name.slice(0,1))}</div>
         <div class="participant-info">
           <div class="participant-name">${escapeHtml(r.name)}</div>
-          <div class="participant-meta">${timeStr} · 필수 ${mustN}개 · 참고 ${niceN}개 · 불필요 ${noN}개</div>
+          <div class="participant-meta">${timeStr} · ${ranked}개 선택</div>
         </div>
         <div class="participant-actions">
           <button class="btn-sm btn-sm-primary" onclick="showDetailView(${i},'results')">상세</button>
