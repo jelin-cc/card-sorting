@@ -2625,7 +2625,7 @@
     const m = getMode();
     const n = allResults.length;
     document.getElementById('resultsSub').textContent = `${n}명의 참여자 데이터를 기반으로 분석한 결과입니다`;
-    document.querySelector('.results-title').textContent = `📊 ${m.title} 소팅 인사이트`;
+    document.querySelector('.results-title').textContent = `${m.title} 소팅 인사이트`;
 
     if (n === 0) {
       body.innerHTML = `<div style="text-align:center;padding:80px 20px">
@@ -2636,7 +2636,7 @@
       return;
     }
 
-    // Collect all card names from actual data (handles old/new card names)
+    // Collect all card names from actual data
     const allCardNames = new Set();
     allResults.forEach(r => {
       (r.priority || []).forEach(c => allCardNames.add(c));
@@ -2657,7 +2657,6 @@
       });
     });
 
-    // Priority ranking (avg rank, lower = more important)
     const ranked = cards.filter(c => priorityScores[c].length > 0)
       .map(c => ({
         name: c,
@@ -2667,70 +2666,60 @@
       }))
       .sort((a, b) => a.avg - b.avg);
 
+    const maxCount = ranked.length > 0 ? ranked[0].count : 1;
     let html = '';
 
-    // ===== 1. Summary Stats Row =====
-    const avgCards = allResults.reduce((s,r) => s + (r.priority||[]).length, 0) / n;
-    html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px">
-      <div class="result-card" style="text-align:center;padding:20px">
-        <div style="font-size:28px;font-weight:800;color:var(--gray-900)">${n}명</div>
-        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">총 참여자</div>
-      </div>
-      <div class="result-card" style="text-align:center;padding:20px">
-        <div style="font-size:28px;font-weight:800;color:var(--primary)">${avgCards.toFixed(1)}개</div>
-        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">평균 선택 카드 수</div>
-      </div>
-      <div class="result-card" style="text-align:center;padding:20px">
-        <div style="font-size:28px;font-weight:800;color:var(--red)">${ranked.length > 0 ? ranked[0].name : '-'}</div>
-        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">가장 중요한 정보 1위</div>
-      </div>
-    </div>`;
+    // ===== 1. Hero Insight =====
+    if (ranked.length > 0) {
+      const top = ranked[0];
+      html += `<div class="result-card" style="padding:32px;text-align:center;margin-bottom:24px;background:linear-gradient(135deg,#FFF5F5 0%,white 50%,#F0FFF4 100%)">
+        <div style="font-size:14px;color:var(--gray-400);margin-bottom:8px">${n}명의 참여자가 뽑은</div>
+        <div style="font-size:32px;font-weight:800;color:var(--gray-900);margin-bottom:4px">${top.name}</div>
+        <div style="font-size:15px;color:var(--gray-500)">가장 중요한 정보 <span style="color:var(--red);font-weight:700">1위</span> · 평균 ${top.avg.toFixed(1)}순위 · ${top.count}명 선택</div>
+      </div>`;
+    }
 
-    // ===== 2. Priority Ranking (Hero) =====
+    // ===== 2. Priority Ranking =====
     html += `<div class="result-section"><div class="result-section-title">우선순위 종합 랭킹</div>
-      <div style="font-size:13px;color:var(--gray-400);margin:-12px 0 16px">평균 순위가 낮을수록 더 중요하게 평가된 정보입니다</div>
       <div class="result-card" style="padding:0;overflow:hidden">`;
     ranked.forEach((item, i) => {
-      const barW = Math.max(8, 100 - (item.avg - 1) * 15);
+      const barW = Math.round(item.count / n * 100);
       const isTop3 = i < 3;
-      const medals = ['🥇','🥈','🥉'];
-      html += `<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;${i < ranked.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''}">
-        <div style="width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:${isTop3?'18px':'14px'};font-weight:800;flex-shrink:0;${isTop3?'background:var(--red-light);color:var(--red)':'background:var(--gray-100);color:var(--gray-500)'}">${isTop3 ? medals[i] : i+1}</div>
+      html += `<div style="display:flex;align-items:center;gap:12px;padding:14px 20px;${i < ranked.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''}">
+        <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;${isTop3?'background:var(--red);color:white':'background:var(--gray-100);color:var(--gray-500)'}">${i+1}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:700;color:var(--gray-900)">${item.name}</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-            <div style="flex:1;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
-              <div style="width:${barW}%;height:100%;background:${isTop3?'var(--red)':'var(--gray-300)'};border-radius:3px;transition:width 0.6s"></div>
-            </div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+            <span style="font-size:15px;font-weight:700;color:var(--gray-900)">${item.name}</span>
+            <span style="font-size:12px;color:var(--gray-400)">${item.count}명 선택</span>
+          </div>
+          <div style="height:4px;background:var(--gray-100);border-radius:2px;overflow:hidden">
+            <div style="width:${barW}%;height:100%;background:${isTop3?'var(--red)':'var(--gray-300)'};border-radius:2px;transition:width 0.6s"></div>
           </div>
         </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:16px;font-weight:800;color:${isTop3?'var(--red)':'var(--gray-500)'}">평균 ${item.avg.toFixed(1)}</div>
-          <div style="font-size:11px;color:var(--gray-400)">${item.count}명 선택</div>
-        </div>
+        <div style="font-size:14px;font-weight:800;color:${isTop3?'var(--red)':'var(--gray-400)'}; flex-shrink:0;min-width:50px;text-align:right">${item.avg.toFixed(1)}위</div>
       </div>`;
     });
     html += `</div></div>`;
 
-    // ===== 3. Selection Distribution =====
+    // ===== 3. Selection Heatmap =====
     const sortedByMust = cards.filter(c => catCounts[c]).sort((a,b) => catCounts[b].must - catCounts[a].must);
     html += `<div class="result-section"><div class="result-section-title">선택 분포</div>
-      <div style="display:flex;gap:12px;margin:-8px 0 16px;font-size:12px;color:var(--gray-400)">
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--red)"></span> 필수 (1-3순위)</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--yellow)"></span> 선택 (4-6순위)</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--gray-200)"></span> 미선택</span>
+      <div style="display:flex;gap:16px;margin:-8px 0 14px;font-size:12px;color:var(--gray-400)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red)"></span> 필수</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--yellow)"></span> 선택</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--gray-200)"></span> 미선택</span>
       </div>
       <div class="result-card" style="padding:0;overflow:hidden">`;
     sortedByMust.forEach((c, i) => {
-      const must = catCounts[c].must, nice = catCounts[c].nice, no = catCounts[c].no;
-      const mustPct = must/n*100, nicePct = nice/n*100, noPct = no/n*100;
-      html += `<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;${i < sortedByMust.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''}">
-        <div style="min-width:100px;font-size:14px;font-weight:600;color:var(--gray-800)">${c}</div>
-        <div style="flex:1;display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;background:var(--gray-100)">
+      const must = catCounts[c].must, nice = catCounts[c].nice;
+      const mustPct = must/n*100, nicePct = nice/n*100;
+      html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 20px;${i < sortedByMust.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''}">
+        <div style="min-width:90px;font-size:13px;font-weight:600;color:var(--gray-800)">${c}</div>
+        <div style="flex:1;display:flex;gap:1px;height:6px;border-radius:3px;overflow:hidden;background:var(--gray-100)">
           <div style="width:${mustPct}%;background:var(--red);transition:width 0.6s"></div>
           <div style="width:${nicePct}%;background:var(--yellow);transition:width 0.6s"></div>
         </div>
-        <div style="min-width:80px;text-align:right;font-size:13px;font-weight:700;color:var(--red)">${must}명</div>
+        <div style="min-width:40px;text-align:right;font-size:12px;font-weight:700;color:${must>0?'var(--red)':'var(--gray-300)'}">${must>0?must+'명':'-'}</div>
       </div>`;
     });
     html += `</div></div>`;
