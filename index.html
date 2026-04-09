@@ -1391,21 +1391,26 @@
   }
 
   .pool-card {
-    padding: 14px 10px;
+    padding: 16px 14px;
     background: white;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
     cursor: grab;
     user-select: none;
     transition: all 0.15s;
     text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 72px;
   }
 
   .pool-card:hover {
-    border-color: var(--gray-400);
-    background: var(--gray-50);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--gray-300);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   }
 
   .pool-card:active, .pool-card.dragging {
@@ -1415,15 +1420,16 @@
   }
 
   .pool-card-name {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--gray-800);
+    color: var(--gray-900);
+    line-height: 1.3;
   }
 
   .pool-card-example {
-    font-size: 11px;
-    color: var(--gray-400);
-    margin-top: 3px;
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 4px;
   }
 
   .ref-divider {
