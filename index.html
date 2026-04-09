@@ -401,7 +401,7 @@
 
   .sort-right {
     flex: 1;
-    padding: 28px 32px;
+    padding: 28px 40px;
     min-width: 0;
     background: var(--gray-50);
   }
@@ -1437,16 +1437,8 @@
     margin: 20px 0 16px;
   }
 
-  .ranking-panel {
-    border-radius: 20px;
-    background: white;
-    padding: 28px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    max-width: 560px;
-  }
-
   .ranking-question {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
 
   .ranking-question h3 {
@@ -1666,27 +1658,24 @@
   </div>
 
   <div class="sort-layout">
-    <!-- LEFT: Card Pool (sticky) -->
+    <!-- LEFT: Question + Card Pool -->
     <div class="sort-left">
+      <div class="ranking-question">
+        <h3 id="rankingQuestion">이 정보가 있으면<br>공고를 눌러볼 것 같아요</h3>
+        <p id="rankingDesc">중요한 카드를 골라 오른쪽 순위칸에 넣어주세요.<br>필수 3개는 꼭 채워주시고, 나머지 3개는 선택이에요.</p>
+      </div>
       <div class="unsorted-pool">
-        <div class="unsorted-pool-label">드래그해서 오른쪽에 배치하세요</div>
         <div class="unsorted-pool-cards" id="unsortedCards"></div>
       </div>
     </div>
 
-    <!-- RIGHT: Ranking Area -->
+    <!-- RIGHT: Ranking Slots -->
     <div class="sort-right">
-      <div class="ranking-panel">
-        <div class="ranking-question">
-          <h3 id="rankingQuestion">이 정보가 있으면<br>공고를 눌러볼 것 같아요</h3>
-          <p id="rankingDesc">왼쪽 카드를 드래그해서 중요한 순서대로 배치해주세요.<br>필수 3개는 꼭 채워주시고, 나머지 3개는 선택이에요.</p>
-        </div>
-        <div class="ranking-section-label required">필수 3개</div>
-        <div class="ranking-slots" id="rankingSlotsRequired"></div>
-        <div class="ranking-divider"></div>
-        <div class="ranking-section-label optional">선택 (최대 3개)</div>
-        <div class="ranking-slots" id="rankingSlotsOptional"></div>
-      </div>
+      <div class="ranking-section-label required">필수 3개</div>
+      <div class="ranking-slots" id="rankingSlotsRequired"></div>
+      <div class="ranking-divider"></div>
+      <div class="ranking-section-label optional">선택 (최대 3개)</div>
+      <div class="ranking-slots" id="rankingSlotsOptional"></div>
     </div>
   </div>
 </div>
