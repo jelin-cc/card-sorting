@@ -318,7 +318,7 @@
   /* ===== SORTING ===== */
   #sorting {
     flex-direction: column;
-    background: white;
+    background: var(--gray-50);
   }
 
   .sort-header {
@@ -387,8 +387,6 @@
     flex: 1;
     display: flex;
     gap: 0;
-    max-width: 1200px;
-    margin: 0 auto;
     width: 100%;
   }
 
@@ -397,6 +395,7 @@
     flex-shrink: 0;
     padding: 20px;
     background: white;
+    border-right: 1px solid var(--gray-100);
     position: sticky;
     top: 100px;
     align-self: flex-start;
@@ -406,9 +405,9 @@
 
   .sort-right {
     flex: 1;
-    padding: 20px 28px;
+    padding: 28px 32px;
     min-width: 0;
-    background: var(--gray-100);
+    background: var(--gray-50);
   }
 
   .ref-panel-title {
@@ -1365,17 +1364,14 @@
 
   /* ===== RANKING LAYOUT ===== */
   .unsorted-pool {
-    margin-top: 24px;
+    margin-bottom: 20px;
   }
 
   .unsorted-pool-label {
     font-size: 13px;
     font-weight: 700;
-    color: var(--gray-400);
+    color: var(--gray-500);
     margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
 
   .unsorted-pool-cards {
@@ -1386,12 +1382,12 @@
   }
 
   .unsorted-pool-cards:empty::after {
-    content: '모든 카드를 배치했어요!';
+    content: 'all sorted!';
     color: var(--gray-300);
     font-size: 13px;
     font-weight: 500;
     text-align: center;
-    padding: 16px;
+    padding: 20px;
     grid-column: 1 / -1;
   }
 
@@ -1407,8 +1403,8 @@
   }
 
   .pool-card:hover {
-    border-color: var(--primary);
-    background: var(--primary-light);
+    border-color: var(--gray-400);
+    background: var(--gray-50);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
   }
@@ -1420,7 +1416,7 @@
   }
 
   .pool-card-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--gray-800);
   }
@@ -1428,87 +1424,116 @@
   .pool-card-example {
     font-size: 11px;
     color: var(--gray-400);
-    margin-top: 2px;
+    margin-top: 3px;
+  }
+
+  .ref-divider {
+    height: 1px;
+    background: var(--gray-200);
+    margin: 20px 0 16px;
   }
 
   .ranking-panel {
-    border: 2px solid rgba(0, 196, 113, 0.2);
-    border-radius: var(--radius);
-    background: var(--primary-light);
-    padding: 24px;
+    border-radius: 20px;
+    background: white;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    max-width: 560px;
   }
 
   .ranking-question {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
 
   .ranking-question h3 {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--gray-900);
     margin-bottom: 8px;
     line-height: 1.4;
+    letter-spacing: -0.3px;
   }
 
   .ranking-question p {
-    font-size: 13px;
-    color: var(--gray-500);
+    font-size: 14px;
+    color: var(--gray-400);
     line-height: 1.6;
+  }
+
+  .ranking-section-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .ranking-section-label.required {
+    background: var(--red-light);
+    color: var(--red);
+  }
+
+  .ranking-section-label.optional {
+    background: var(--gray-100);
+    color: var(--gray-400);
   }
 
   .ranking-slots {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .ranking-slot {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
-
-  .slot-meta {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 80px;
-    flex-shrink: 0;
-    justify-content: flex-end;
-  }
-
-  .slot-label {
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .slot-label.required { color: var(--gray-700); }
-  .slot-label.optional { color: var(--gray-400); }
 
   .slot-number {
-    font-size: 16px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
     font-weight: 800;
-    color: var(--gray-700);
-    min-width: 20px;
-    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .slot-number.required {
+    background: var(--red);
+    color: white;
+  }
+
+  .slot-number.optional {
+    background: var(--gray-200);
+    color: var(--gray-500);
   }
 
   .slot-drop-zone {
     flex: 1;
-    min-height: 52px;
-    border: 2px dashed var(--gray-300);
+    min-height: 48px;
+    border: 2px dashed var(--gray-200);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
     transition: all 0.2s;
-    background: white;
+    background: var(--gray-50);
+  }
+
+  .ranking-slot.required .slot-drop-zone {
+    border-color: rgba(255,77,77,0.2);
   }
 
   .slot-drop-zone.empty::after {
-    content: '+ 여기에 드래그';
+    content: '카드를 여기에 놓아주세요';
     color: var(--gray-300);
     font-size: 13px;
     font-weight: 500;
@@ -1516,15 +1541,15 @@
 
   .slot-drop-zone.drag-over {
     border-color: var(--primary);
-    background: rgba(0, 196, 113, 0.08);
+    background: var(--primary-light);
     box-shadow: 0 0 0 3px rgba(0, 196, 113, 0.1);
   }
 
   .slot-drop-zone.filled {
-    border-style: solid;
-    border-color: var(--gray-200);
+    border: 1.5px solid var(--gray-200);
     background: white;
-    padding: 6px 12px;
+    padding: 8px 12px;
+    box-shadow: var(--shadow);
   }
 
   .slot-chip {
@@ -1566,22 +1591,22 @@
 
   .ranking-divider {
     height: 1px;
-    background: var(--gray-300);
-    margin: 4px 0;
+    background: var(--gray-100);
+    margin: 16px 0;
   }
 
   .unsorted-pool-cards.drag-over {
-    background: var(--gray-50);
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    background: var(--primary-light);
+    outline: 2px dashed var(--primary);
+    outline-offset: -2px;
     border-radius: 12px;
   }
 
   @media (max-width: 768px) {
     .sort-left .ref-panel { display: none; }
-    .unsorted-pool { margin-top: 0; }
     .unsorted-pool-cards { grid-template-columns: 1fr 1fr; }
-    .ranking-panel { padding: 16px; }
-    .slot-meta { min-width: 64px; }
+    .ranking-panel { padding: 20px; }
+    .sort-right { padding: 16px; }
   }
 </style>
 </head>
@@ -1639,108 +1664,10 @@
   </div>
 
   <div class="sort-layout">
-    <!-- LEFT: Example Cards (sticky) -->
+    <!-- LEFT: Card Pool (sticky) -->
     <div class="sort-left">
-      <div class="ref-panel">
-        <div class="ref-panel-title" id="refPanelTitle">💼 공고 카드 예시</div>
-        <div class="ref-panel-sub" id="refPanelSub">이런 카드에 들어갈 정보를 분류합니다</div>
-
-        <!-- Job card examples -->
-        <div class="ref-card-stack" id="refJobCards">
-          <div class="ref-card-label">이미지형 카드</div>
-          <div class="jd-card jd-card-img">
-            <div class="jd-img">
-              <div class="jd-img-badge">
-                <span class="jd-badge-icon">🎁</span>
-                <span>취업축하금 <b style="color:#FFB74D">200</b>만원</span>
-              </div>
-              <div class="jd-img-bookmark"><svg width="14" height="17" viewBox="0 0 14 17" fill="none"><path d="M1 3C1 1.9 1.9 1 3 1h8c1.1 0 2 .9 2 2v13l-6-3-6 3V3z" fill="#E5E6E9" stroke="white" stroke-width="1"/></svg></div>
-            </div>
-            <div class="jd-body">
-              <div class="jd-title">콘텐츠 디자이너 (3년 이상)</div>
-              <div class="jd-company-row">
-                <span class="jd-company">웍스피어(유)</span>
-                <span class="jd-dday">D-3</span>
-              </div>
-              <div class="jd-meta">서울 · 경력 3년↑</div>
-              <div class="jd-tags">
-                <span class="jd-tag green">워라밸 상위 10%</span>
-                <span class="jd-tag green">수평문화</span>
-              </div>
-            </div>
-          </div>
-          <div class="ref-card-label" style="margin-top:20px">리스트형 카드</div>
-          <div class="jd-card jd-card-list">
-            <div class="jd-list-body">
-              <div class="jd-list-main">
-                <div class="jd-title">Frontend Engineer (React)</div>
-                <div class="jd-company" style="margin-top:4px">네이버</div>
-                <div class="jd-meta" style="margin-top:8px">서울 · 경력 3년↑ · 학력무관</div>
-                <div class="jd-tags" style="margin-top:12px">
-                  <span class="jd-dday">D-3</span>
-                  <span class="jd-tag green">승진 언급 ▲ 12건</span>
-                </div>
-              </div>
-              <div class="jd-list-bookmark"><svg width="14" height="17" viewBox="0 0 14 17" fill="none"><path d="M1 3C1 1.9 1.9 1 3 1h8c1.1 0 2 .9 2 2v13l-6-3-6 3V3z" fill="#AFB5BE"/></svg></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Review card example -->
-        <div class="ref-card-stack" id="refReviewCards" style="display:none">
-          <div class="ref-card-label">리뷰 카드 예시</div>
-          <div class="review-card">
-            <!-- Header -->
-            <div class="review-card-header">
-              <div class="review-logo">당</div>
-              <div class="review-company-name">(주)당근마켓</div>
-            </div>
-            <div class="review-meta">
-              백엔드 <span>|</span> 현직원 <span>|</span> 서울 <span>|</span> 2026.03 작성
-            </div>
-            <!-- Score + Bars (2-column like original) -->
-            <div style="display:flex; gap:12px; margin:12px 0">
-              <div style="flex-shrink:0">
-                <div class="review-score-num">5.0</div>
-                <div class="review-stars">★★★★★</div>
-                <div class="review-bars" style="margin-top:10px">
-                  <div class="review-bar-row"><span class="review-bar-label">승진 기회</span><div class="review-bar"><div class="review-bar-fill" style="width:90%"></div></div></div>
-                  <div class="review-bar-row"><span class="review-bar-label">복지/급여</span><div class="review-bar"><div class="review-bar-fill" style="width:85%"></div></div></div>
-                  <div class="review-bar-row"><span class="review-bar-label">워라밸</span><div class="review-bar"><div class="review-bar-fill" style="width:95%"></div></div></div>
-                  <div class="review-bar-row"><span class="review-bar-label">사내문화</span><div class="review-bar"><div class="review-bar-fill" style="width:92%"></div></div></div>
-                  <div class="review-bar-row"><span class="review-bar-label">경영진</span><div class="review-bar"><div class="review-bar-fill" style="width:75%"></div></div></div>
-                </div>
-              </div>
-              <div style="flex:1; min-width:0">
-                <div class="review-title-text">워라밸과 사내문화 모두 최상급<br>자율 출퇴근에 무제한 휴가까지</div>
-                <div class="review-pros-cons">
-                  <div style="margin-bottom:6px">
-                    <span class="review-label pro">장점</span>
-                    <span class="review-text" style="display:inline">자율과 책임의 밸런스가 완벽. 무제한 휴가를 실제로 자유롭게 사용 가능. 동료들이 서로 존중하는 문화.</span>
-                  </div>
-                  <div style="margin-bottom:6px">
-                    <span class="review-label con">단점</span>
-                    <span class="review-text" style="display:inline">높은 자율성이 주어지는 만큼 셀프 매니지먼트 능력이 필요. 프로세스가 아직 정립 중인 부분이 있음.</span>
-                  </div>
-                  <div>
-                    <span class="review-label" style="background:var(--gray-100);color:var(--gray-500)">경영진에게 바라는 점</span>
-                    <span class="review-text" style="display:inline">보다 일관된 방향성과 우선순위 제시, 안정적으로 몰입 가능</span>
-                  </div>
-                </div>
-                <div style="font-size:10px; color:#768091; margin-top:8px; line-height:1.5">
-                  — 1년 후 성장하고 있을 것 같아요<br>👍 기업을 추천해요
-                </div>
-              </div>
-            </div>
-            <!-- Footer -->
-            <div class="review-footer">
-              <span class="review-helpful">도움이 돼요 👍 198</span>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="unsorted-pool">
-        <div class="unsorted-pool-label">📦 분류할 카드</div>
+        <div class="unsorted-pool-label">드래그해서 오른쪽에 배치하세요</div>
         <div class="unsorted-pool-cards" id="unsortedCards"></div>
       </div>
     </div>
@@ -1749,10 +1676,14 @@
     <div class="sort-right">
       <div class="ranking-panel">
         <div class="ranking-question">
-          <h3 id="rankingQuestion">어떤 정보가 있으면 공고를 눌러볼 것 같으신가요?</h3>
-          <p id="rankingDesc">우선 순위에 따라 최대 6개를 나열해 보세요.<br>필수 3개 / 나머지는 선택입니다.</p>
+          <h3 id="rankingQuestion">이 정보가 있으면 공고를 눌러볼 것 같아요</h3>
+          <p id="rankingDesc">가장 중요한 정보부터 순서대로 배치해주세요</p>
         </div>
-        <div class="ranking-slots" id="rankingSlots"></div>
+        <div class="ranking-section-label required">필수 3개</div>
+        <div class="ranking-slots" id="rankingSlotsRequired"></div>
+        <div class="ranking-divider"></div>
+        <div class="ranking-section-label optional">선택 (최대 3개)</div>
+        <div class="ranking-slots" id="rankingSlotsOptional"></div>
       </div>
     </div>
   </div>
@@ -1856,11 +1787,9 @@
       title: '공고 카드 정보',
       storageKey: 'cardSortResults',
       sortTitle: '어떤 정보가 가장 중요한가요?',
-      sortDesc: '왼쪽 카드를 드래그해서 우선순위를 정해주세요.',
-      rankQuestion: '어떤 정보가 있으면 공고를 눌러볼 것 같으신가요?',
-      rankDesc: '우선 순위에 따라 최대 6개를 나열해 보세요.<br>필수 3개 / 나머지는 선택입니다.',
-      refTitle: '💼 공고 카드 예시',
-      refSub: '이런 카드에 들어갈 정보를 분류합니다',
+      sortDesc: '왼쪽에서 중요한 카드를 골라 오른쪽 순위칸에 넣어주세요',
+      rankQuestion: '이 정보가 있으면 공고를 눌러볼 것 같아요',
+      rankDesc: '가장 중요한 정보부터 순서대로 배치해주세요',
       fabIcon: '📝', fabLabel: '리뷰 정보 나누기',
       color: '#00C471'
     },
@@ -1869,12 +1798,10 @@
       icon: '📝',
       title: '리뷰 정보',
       storageKey: 'reviewSortResults',
-      sortTitle: '리뷰에서 어떤 정보가 가장 중요한가요?',
-      sortDesc: '왼쪽 카드를 드래그해서 우선순위를 정해주세요.',
-      rankQuestion: '리뷰에서 어떤 정보가 가장 중요한가요?',
-      rankDesc: '우선 순위에 따라 최대 6개를 나열해 보세요.<br>필수 3개 / 나머지는 선택입니다.',
-      refTitle: '📝 리뷰 카드 예시',
-      refSub: '이런 리뷰에 들어갈 정보를 분류합니다',
+      sortTitle: '리뷰에서 어떤 정보가 중요한가요?',
+      sortDesc: '왼쪽에서 중요한 카드를 골라 오른쪽 순위칸에 넣어주세요',
+      rankQuestion: '이 정보가 있으면 리뷰를 자세히 볼 것 같아요',
+      rankDesc: '가장 중요한 정보부터 순서대로 배치해주세요',
       fabIcon: '💼', fabLabel: '공고 카드 나누기',
       color: '#6366F1'
     }
@@ -2202,10 +2129,6 @@
     document.getElementById('sortDesc').textContent = m.sortDesc;
     document.getElementById('rankingQuestion').innerHTML = m.rankQuestion;
     document.getElementById('rankingDesc').innerHTML = m.rankDesc;
-    document.getElementById('refPanelTitle').textContent = m.refTitle;
-    document.getElementById('refPanelSub').textContent = m.refSub;
-    document.getElementById('refJobCards').style.display = currentMode === 'job' ? '' : 'none';
-    document.getElementById('refReviewCards').style.display = currentMode === 'review' ? '' : 'none';
     showScreen('sorting');
     document.getElementById('sortParticipantBadge').textContent = currentName;
     renderSortingScreen();
@@ -2290,33 +2213,22 @@
   }
 
   function renderRankingSlots() {
-    const container = document.getElementById('rankingSlots');
-    container.innerHTML = '';
+    const reqContainer = document.getElementById('rankingSlotsRequired');
+    const optContainer = document.getElementById('rankingSlotsOptional');
+    reqContainer.innerHTML = '';
+    optContainer.innerHTML = '';
 
     for (let i = 0; i < 6; i++) {
-      if (i === 3) {
-        const divider = document.createElement('div');
-        divider.className = 'ranking-divider';
-        container.appendChild(divider);
-      }
+      const isRequired = i < 3;
+      const container = isRequired ? reqContainer : optContainer;
 
       const slot = document.createElement('div');
-      slot.className = 'ranking-slot';
+      slot.className = 'ranking-slot' + (isRequired ? ' required' : ' optional');
 
-      const meta = document.createElement('div');
-      meta.className = 'slot-meta';
-
-      const label = document.createElement('span');
-      label.className = 'slot-label ' + (i < 3 ? 'required' : 'optional');
-      label.textContent = i < 3 ? '🔥 필수' : '(선택)';
-      meta.appendChild(label);
-
-      const number = document.createElement('span');
-      number.className = 'slot-number';
+      const number = document.createElement('div');
+      number.className = 'slot-number ' + (isRequired ? 'required' : 'optional');
       number.textContent = i + 1;
-      meta.appendChild(number);
-
-      slot.appendChild(meta);
+      slot.appendChild(number);
 
       const dropZone = document.createElement('div');
       dropZone.className = 'slot-drop-zone' + (rankedSlots[i] ? ' filled' : ' empty');
