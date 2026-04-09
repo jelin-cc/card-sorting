@@ -403,7 +403,7 @@
     flex: 1;
     padding: 28px 40px;
     min-width: 0;
-    background: var(--gray-50);
+    background: #F5F6F8;
   }
 
   .ref-panel-title {
@@ -1456,16 +1456,51 @@
     line-height: 1.7;
   }
 
+  .ranking-question p b {
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  .ranking-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    margin-bottom: 16px;
+  }
+
+  .ranking-card.required {
+    border: 1.5px solid rgba(255,77,77,0.15);
+    background: linear-gradient(180deg, rgba(255,77,77,0.02) 0%, white 40%);
+  }
+
+  .ranking-card.optional {
+    border: 1.5px solid var(--gray-100);
+  }
+
+  .ranking-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .ranking-card-hint {
+    font-size: 13px;
+    color: var(--gray-400);
+    font-weight: 500;
+  }
+
   .ranking-section-label {
     font-size: 12px;
     font-weight: 800;
-    letter-spacing: 0.5px;
-    padding: 4px 10px;
-    border-radius: 6px;
+    letter-spacing: 0.3px;
+    padding: 5px 12px;
+    border-radius: 8px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-bottom: 12px;
+    flex-shrink: 0;
   }
 
   .ranking-section-label.required {
@@ -1481,7 +1516,7 @@
   .ranking-slots {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .ranking-slot {
@@ -1491,12 +1526,12 @@
   }
 
   .slot-number {
-    width: 28px; height: 28px;
-    border-radius: 50%;
+    width: 32px; height: 32px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
     flex-shrink: 0;
   }
@@ -1504,28 +1539,31 @@
   .slot-number.required {
     background: var(--red);
     color: white;
+    box-shadow: 0 2px 8px rgba(255,77,77,0.25);
   }
 
   .slot-number.optional {
-    background: var(--gray-200);
+    background: var(--gray-100);
     color: var(--gray-500);
+    border: 1.5px solid var(--gray-200);
   }
 
   .slot-drop-zone {
     flex: 1;
-    min-height: 48px;
+    min-height: 52px;
     border: 2px dashed var(--gray-200);
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 16px;
+    padding: 10px 16px;
     transition: all 0.2s;
     background: var(--gray-50);
   }
 
   .ranking-slot.required .slot-drop-zone {
-    border-color: rgba(255,77,77,0.2);
+    border-color: rgba(255,77,77,0.18);
+    background: rgba(255,77,77,0.02);
   }
 
   .slot-drop-zone.empty::after {
@@ -1544,8 +1582,8 @@
   .slot-drop-zone.filled {
     border: 1.5px solid var(--gray-200);
     background: white;
-    padding: 8px 12px;
-    box-shadow: var(--shadow);
+    padding: 10px 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
 
   .slot-chip {
@@ -1563,7 +1601,7 @@
   }
 
   .slot-chip-example {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--gray-400);
   }
 
@@ -1584,12 +1622,6 @@
   }
 
   .slot-chip-remove:hover { color: var(--red); background: var(--red-light); }
-
-  .ranking-divider {
-    height: 1px;
-    background: var(--gray-100);
-    margin: 16px 0;
-  }
 
   .unsorted-pool-cards.drag-over {
     background: var(--primary-light);
@@ -1661,8 +1693,8 @@
     <!-- LEFT: Question + Card Pool -->
     <div class="sort-left">
       <div class="ranking-question">
-        <h3 id="rankingQuestion">이 정보가 있으면<br>공고를 눌러볼 것 같아요</h3>
-        <p id="rankingDesc">중요한 카드를 골라 오른쪽 순위칸에 넣어주세요.<br>필수 3개는 꼭 채워주시고, 나머지 3개는 선택이에요.</p>
+        <h3 id="rankingQuestion">어떤 정보가 있으면<br>공고를 눌러볼 것 같으신가요?</h3>
+        <p id="rankingDesc">중요한 카드를 골라 오른쪽 순위칸에 넣어주세요.<br><b>필수 3개</b>는 꼭 채워주시고, 나머지 3개는 선택이에요.</p>
       </div>
       <div class="unsorted-pool">
         <div class="unsorted-pool-cards" id="unsortedCards"></div>
@@ -1671,11 +1703,20 @@
 
     <!-- RIGHT: Ranking Slots -->
     <div class="sort-right">
-      <div class="ranking-section-label required">필수 3개</div>
-      <div class="ranking-slots" id="rankingSlotsRequired"></div>
-      <div class="ranking-divider"></div>
-      <div class="ranking-section-label optional">선택 (최대 3개)</div>
-      <div class="ranking-slots" id="rankingSlotsOptional"></div>
+      <div class="ranking-card required">
+        <div class="ranking-card-header">
+          <span class="ranking-section-label required">필수 3개</span>
+          <span class="ranking-card-hint">꼭 채워주세요</span>
+        </div>
+        <div class="ranking-slots" id="rankingSlotsRequired"></div>
+      </div>
+      <div class="ranking-card optional">
+        <div class="ranking-card-header">
+          <span class="ranking-section-label optional">선택 (최대 3개)</span>
+          <span class="ranking-card-hint">추가로 중요한 정보가 있다면</span>
+        </div>
+        <div class="ranking-slots" id="rankingSlotsOptional"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1776,8 +1817,8 @@
       storageKey: 'cardSortResults',
       sortTitle: '어떤 정보가 가장 중요한가요?',
       sortDesc: '왼쪽에서 중요한 카드를 골라 오른쪽 순위칸에 넣어주세요',
-      rankQuestion: '이 정보가 있으면 공고를 눌러볼 것 같아요',
-      rankDesc: '최대 6개까지 순서대로 배치해주세요.<br>필수 3개는 꼭 채워주시고, 나머지 3개는 선택이에요.',
+      rankQuestion: '어떤 정보가 있으면<br>공고를 눌러볼 것 같으신가요?',
+      rankDesc: '중요한 카드를 골라 오른쪽 순위칸에 넣어주세요.<br><b>필수 3개</b>는 꼭 채워주시고, 나머지 3개는 선택이에요.',
       fabIcon: '📝', fabLabel: '리뷰 정보 나누기',
       color: '#00C471'
     },
@@ -1788,8 +1829,8 @@
       storageKey: 'reviewSortResults',
       sortTitle: '리뷰에서 어떤 정보가 중요한가요?',
       sortDesc: '왼쪽에서 중요한 카드를 골라 오른쪽 순위칸에 넣어주세요',
-      rankQuestion: '이 정보가 있으면 리뷰를 자세히 볼 것 같아요',
-      rankDesc: '최대 6개까지 순서대로 배치해주세요.<br>필수 3개는 꼭 채워주시고, 나머지 3개는 선택이에요.',
+      rankQuestion: '어떤 정보가 있으면<br>리뷰를 자세히 볼 것 같으신가요?',
+      rankDesc: '중요한 카드를 골라 오른쪽 순위칸에 넣어주세요.<br><b>필수 3개</b>는 꼭 채워주시고, 나머지 3개는 선택이에요.',
       fabIcon: '💼', fabLabel: '공고 카드 나누기',
       color: '#6366F1'
     }
