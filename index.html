@@ -425,14 +425,13 @@
     width: 420px;
     flex-shrink: 0;
     padding-right: 28px;
+    border-right: 1px solid var(--gray-200);
   }
 
   .sort-right {
     flex: 1;
-    padding: 20px 24px;
+    padding-left: 28px;
     min-width: 0;
-    background: var(--gray-50);
-    border-radius: 20px;
   }
 
   .ref-panel-title {
@@ -1537,19 +1536,21 @@
   }
 
   .ranking-card {
-    background: var(--gray-50);
+    background: white;
     border-radius: 16px;
-    padding: 20px 20px 20px 28px;
+    padding: 20px;
     margin-bottom: 16px;
-    overflow: visible;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
   }
 
   .ranking-card.required {
-    background: linear-gradient(180deg, #FFF0F0 0%, #FFFAFA 40%, white 100%);
+    background: linear-gradient(180deg, #FFF0F0 0%, white 30%);
+    border-color: rgba(255,77,77,0.15);
   }
 
   .ranking-card.optional {
-    background: var(--gray-50);
+    background: white;
   }
 
   .ranking-card-header {
