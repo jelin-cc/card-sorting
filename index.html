@@ -2637,10 +2637,13 @@
     }
 
     // Collect all card names from actual data
+    const CARD_ALIASES = { '기업 이미지/로고': '기업/로고 이미지' };
+    const normalizeCard = c => CARD_ALIASES[c] || c;
+
     const allCardNames = new Set();
     allResults.forEach(r => {
-      (r.priority || []).forEach(c => allCardNames.add(c));
-      ['must','nice','no'].forEach(cat => (r.sort[cat]||[]).forEach(c => allCardNames.add(c)));
+      (r.priority || []).forEach(c => allCardNames.add(normalizeCard(c)));
+      ['must','nice','no'].forEach(cat => (r.sort[cat]||[]).forEach(c => allCardNames.add(normalizeCard(c))));
     });
     const cards = [...allCardNames];
 
@@ -2650,10 +2653,10 @@
 
     allResults.forEach(r => {
       ['must','nice','no'].forEach(cat => {
-        (r.sort[cat]||[]).forEach(c => { if (catCounts[c]) catCounts[c][cat]++; });
+        (r.sort[cat]||[]).forEach(c => { const nc = normalizeCard(c); if (catCounts[nc]) catCounts[nc][cat]++; });
       });
       (r.priority||[]).forEach((c, idx) => {
-        if (priorityScores[c]) priorityScores[c].push(idx + 1);
+        const nc = normalizeCard(c); if (priorityScores[nc]) priorityScores[nc].push(idx + 1);
       });
     });
 
