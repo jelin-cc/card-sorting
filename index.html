@@ -2661,29 +2661,27 @@
       });
     });
 
-    const ranked = cards.filter(c => priorityScores[c].length > 0)
+    const ranked = cards.filter(c => catCounts[c])
       .map(c => ({
         name: c,
-        avg: priorityScores[c].reduce((a,b)=>a+b,0) / priorityScores[c].length,
-        count: priorityScores[c].length,
-        mustPct: Math.round(catCounts[c].must / n * 100)
+        avg: priorityScores[c].length > 0 ? priorityScores[c].reduce((a,b)=>a+b,0) / priorityScores[c].length : 999,
+        selectedCount: catCounts[c].must + catCounts[c].nice,
+        selectedPct: Math.round((catCounts[c].must + catCounts[c].nice) / n * 100),
+        priorityCount: priorityScores[c].length
       }))
-      .sort((a, b) => b.count - a.count);
+      .sort((a, b) => b.selectedPct - a.selectedPct || b.selectedCount - a.selectedCount);
 
-    const maxCount = ranked.length > 0 ? ranked[0].count : 1;
     let html = '';
 
     // ===== 1. Hero Insight =====
     if (ranked.length > 0) {
-      const topCount = ranked[0].count;
-      const topItems = ranked.filter(item => item.count === topCount);
+      const topPct = ranked[0].selectedPct;
+      const topItems = ranked.filter(item => item.selectedPct === topPct);
       const topNames = topItems.map(item => item.name).join(', ');
-      const topPct = Math.round(topCount / n * 100);
 
-      const botCount = ranked[ranked.length - 1].count;
-      const botItems = ranked.filter(item => item.count === botCount);
+      const botPct = ranked[ranked.length - 1].selectedPct;
+      const botItems = ranked.filter(item => item.selectedPct === botPct);
       const botNames = botItems.map(item => item.name).join(', ');
-      const botPct = Math.round(botCount / n * 100);
 
       html += `<div style="display:flex;gap:12px;margin-bottom:24px">
         <div class="result-card" style="flex:1;padding:28px 20px;text-align:center;background:linear-gradient(135deg,#FFF5F5 0%,white 100%);border:1px solid rgba(255,70,70,0.08)">
@@ -2703,20 +2701,20 @@
     html += `<div class="result-section"><div class="result-section-title">우선순위 종합 랭킹</div>
       <div class="result-card" style="padding:0;overflow:hidden">`;
     ranked.forEach((item, i) => {
-      const barW = Math.round(item.count / n * 100);
+      const barW = item.selectedPct;
       const isTop3 = i < 3;
       html += `<div style="display:flex;align-items:center;gap:12px;padding:14px 20px;${i < ranked.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''}">
         <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;${isTop3?'background:var(--red);color:white':'background:var(--gray-100);color:var(--gray-500)'}">${i+1}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
             <span style="font-size:15px;font-weight:700;color:var(--gray-900)">${item.name}</span>
-            <span style="font-size:12px;color:var(--gray-400)">${item.count}명 선택</span>
+            <span style="font-size:12px;color:var(--gray-400)">${item.selectedCount}명 선택</span>
           </div>
           <div style="height:4px;background:var(--gray-100);border-radius:2px;overflow:hidden">
             <div style="width:${barW}%;height:100%;background:${isTop3?'var(--red)':'var(--gray-300)'};border-radius:2px;transition:width 0.6s"></div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:800;color:${isTop3?'var(--red)':'var(--gray-400)'}; flex-shrink:0;min-width:50px;text-align:right">${Math.round(item.count / n * 100)}%</div>
+        <div style="font-size:14px;font-weight:800;color:${isTop3?'var(--red)':'var(--gray-400)'}; flex-shrink:0;min-width:50px;text-align:right">${item.selectedPct}%</div>
       </div>`;
     });
     html += `</div></div>`;
