@@ -2671,11 +2671,14 @@
 
     // ===== 1. Hero Insight =====
     if (ranked.length > 0) {
-      const top = ranked[0];
+      const topCount = ranked[0].count;
+      const topItems = ranked.filter(item => item.count === topCount);
+      const topNames = topItems.map(item => item.name).join(', ');
+      const topPct = Math.round(topCount / n * 100);
       html += `<div class="result-card" style="padding:32px;text-align:center;margin-bottom:24px;background:linear-gradient(135deg,#FFF5F5 0%,white 50%,#F0FFF4 100%)">
         <div style="font-size:14px;color:var(--gray-400);margin-bottom:8px">${n}명의 참여자가 뽑은</div>
-        <div style="font-size:32px;font-weight:800;color:var(--gray-900);margin-bottom:4px">${top.name}</div>
-        <div style="font-size:15px;color:var(--gray-500)">가장 중요한 정보 <span style="color:var(--red);font-weight:700">1위</span> · 평균 ${top.avg.toFixed(1)}순위 · ${top.count}명 선택</div>
+        <div style="font-size:32px;font-weight:800;color:var(--gray-900);margin-bottom:4px">${topNames}</div>
+        <div style="font-size:15px;color:var(--gray-500)">가장 중요한 정보 <span style="color:var(--red);font-weight:700">${topItems.length > 1 ? '공동 ' : ''}1위</span> · ${topPct}% 선택</div>
       </div>`;
     }
 
