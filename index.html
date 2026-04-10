@@ -2696,7 +2696,7 @@
             <div style="width:${barW}%;height:100%;background:${isTop3?'var(--red)':'var(--gray-300)'};border-radius:2px;transition:width 0.6s"></div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:800;color:${isTop3?'var(--red)':'var(--gray-400)'}; flex-shrink:0;min-width:50px;text-align:right">${item.avg.toFixed(1)}위</div>
+        <div style="font-size:14px;font-weight:800;color:${isTop3?'var(--red)':'var(--gray-400)'}; flex-shrink:0;min-width:50px;text-align:right">${Math.round(item.count / n * 100)}%</div>
       </div>`;
     });
     html += `</div></div>`;
