@@ -2249,8 +2249,8 @@
     if (id === 'name-input') {
       setTimeout(() => document.getElementById('nameField').focus(), 100);
     }
-    // FAB only on intro
-    document.getElementById('fabMode').style.display = id === 'intro' ? '' : 'none';
+    // FAB disabled
+    document.getElementById('fabMode').style.display = 'none';
     // Save current screen for refresh persistence
     if (['intro','results'].includes(id)) {
       sessionStorage.setItem('currentScreen', id);
