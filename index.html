@@ -2639,11 +2639,12 @@
     // Collect all card names from actual data
     const CARD_ALIASES = { '기업 이미지/로고': '기업/로고 이미지' };
     const normalizeCard = c => CARD_ALIASES[c] || c;
+    const allowedCards = new Set(m.cards);
 
     const allCardNames = new Set();
     allResults.forEach(r => {
-      (r.priority || []).forEach(c => allCardNames.add(normalizeCard(c)));
-      ['must','nice','no'].forEach(cat => (r.sort[cat]||[]).forEach(c => allCardNames.add(normalizeCard(c))));
+      (r.priority || []).forEach(c => { const nc = normalizeCard(c); if (allowedCards.has(nc)) allCardNames.add(nc); });
+      ['must','nice','no'].forEach(cat => (r.sort[cat]||[]).forEach(c => { const nc = normalizeCard(c); if (allowedCards.has(nc)) allCardNames.add(nc); }));
     });
     const cards = [...allCardNames];
 
@@ -2660,8 +2661,7 @@
       });
     });
 
-    const EXCLUDED_CARDS = ['북마크', '현직자 비중'];
-    const ranked = cards.filter(c => priorityScores[c].length > 0 && !EXCLUDED_CARDS.includes(c))
+    const ranked = cards.filter(c => priorityScores[c].length > 0)
       .map(c => ({
         name: c,
         avg: priorityScores[c].reduce((a,b)=>a+b,0) / priorityScores[c].length,
@@ -2722,7 +2722,7 @@
     html += `</div></div>`;
 
     // ===== 3. Selection Heatmap =====
-    const sortedByMust = cards.filter(c => catCounts[c] && !EXCLUDED_CARDS.includes(c)).sort((a,b) => catCounts[b].must - catCounts[a].must);
+    const sortedByMust = cards.filter(c => catCounts[c]).sort((a,b) => catCounts[b].must - catCounts[a].must);
     html += `<div class="result-section"><div class="result-section-title">선택 분포</div>
       <div style="display:flex;gap:16px;margin:-8px 0 14px;font-size:12px;color:var(--gray-400)">
         <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red)"></span> 필수</span>
