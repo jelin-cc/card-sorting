@@ -2664,7 +2664,7 @@
         count: priorityScores[c].length,
         mustPct: Math.round(catCounts[c].must / n * 100)
       }))
-      .sort((a, b) => a.avg - b.avg);
+      .sort((a, b) => b.count - a.count);
 
     const maxCount = ranked.length > 0 ? ranked[0].count : 1;
     let html = '';
