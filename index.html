@@ -2637,7 +2637,7 @@
     }
 
     // Collect all card names from actual data
-    const CARD_ALIASES = { '기업 이미지/로고': '기업/로고 이미지' };
+    const CARD_ALIASES = { '기업 이미지/로고': '기업/로고 이미지', '취업축하금': '취업축하금 여부' };
     const normalizeCard = c => CARD_ALIASES[c] || c;
     const allowedCards = new Set(m.cards);
 
